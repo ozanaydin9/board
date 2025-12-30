@@ -172,7 +172,9 @@ function Column({ column, cards, onAddCard, onUpdateCard, onDeleteCard, onUpdate
             />
           ))}
         </SortableContext>
+      </div>
 
+      <div className="column-footer">
         {isAddingCard ? (
           <div className="add-card-form">
             <input
