@@ -1,29 +1,47 @@
 import { useState } from 'react';
-import { signIn } from '../lib/supabase';
+import { signUp } from '../lib/supabase';
 import '../styles/login.css';
 
 /**
- * Login Component
- * Kullanıcı girişi için basit bir form
+ * SignUp Component
+ * Kullanıcı kaydı için form
  */
-function Login({ onLoginSuccess, onSwitchToSignUp }) {
+function SignUp({ onSignUpSuccess, onBackToLogin }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    
+    // Şifre kontrolü
+    if (password !== confirmPassword) {
+      setError('Şifreler eşleşmiyor');
+      return;
+    }
+
+    if (password.length < 6) {
+      setError('Şifre en az 6 karakter olmalıdır');
+      return;
+    }
+
     setLoading(true);
 
     try {
-      const { data, error } = await signIn(email, password);
+      const { data, error } = await signUp(email, password);
       
       if (error) {
         setError(error.message);
       } else if (data?.user) {
-        onLoginSuccess(data.user);
+        setSuccess(true);
+        // 2 saniye sonra login ekranına dön
+        setTimeout(() => {
+          onSignUpSuccess();
+        }, 2000);
       }
     } catch (err) {
       setError('Bir hata oluştu. Lütfen tekrar deneyin.');
@@ -32,12 +50,32 @@ function Login({ onLoginSuccess, onSwitchToSignUp }) {
     }
   };
 
+  if (success) {
+    return (
+      <div className="login-container">
+        <div className="login-box">
+          <div className="login-header">
+            <h1>✅ Kayıt Başarılı!</h1>
+            <p>Email adresinizi doğrulayın</p>
+          </div>
+          <div style={{ textAlign: 'center', padding: '20px', color: '#94a3b8' }}>
+            <p>Kayıt işleminiz tamamlandı.</p>
+            <p>Email adresinize gönderilen doğrulama linkine tıklayın.</p>
+            <p style={{ marginTop: '20px', fontSize: '12px' }}>
+              Giriş ekranına yönlendiriliyorsunuz...
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="login-container">
       <div className="login-box">
         <div className="login-header">
-          <h1>Board App</h1>
-          <p>Projelerinizi yönetin</p>
+          <h1>Kayıt Ol</h1>
+          <p>Board App'e katılın</p>
         </div>
 
         <form onSubmit={handleSubmit} className="login-form">
@@ -63,7 +101,22 @@ function Login({ onLoginSuccess, onSwitchToSignUp }) {
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
               required
-              autoComplete="current-password"
+              autoComplete="new-password"
+              minLength={6}
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="confirmPassword">Şifre Tekrar</label>
+            <input
+              id="confirmPassword"
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              placeholder="••••••••"
+              required
+              autoComplete="new-password"
+              minLength={6}
             />
           </div>
 
@@ -78,15 +131,15 @@ function Login({ onLoginSuccess, onSwitchToSignUp }) {
             className="login-button"
             disabled={loading}
           >
-            {loading ? 'Giriş yapılıyor...' : 'Giriş Yap'}
+            {loading ? 'Kayıt yapılıyor...' : 'Kayıt Ol'}
           </button>
         </form>
 
         <div className="login-footer">
           <p className="info-text">
-            Hesabınız yok mu?{' '}
+            Zaten hesabınız var mı?{' '}
             <button
-              onClick={onSwitchToSignUp}
+              onClick={onBackToLogin}
               style={{
                 background: 'none',
                 border: 'none',
@@ -97,7 +150,7 @@ function Login({ onLoginSuccess, onSwitchToSignUp }) {
                 padding: 0,
               }}
             >
-              Kayıt Ol
+              Giriş Yap
             </button>
           </p>
         </div>
@@ -106,5 +159,5 @@ function Login({ onLoginSuccess, onSwitchToSignUp }) {
   );
 }
 
-export default Login;
+export default SignUp;
 

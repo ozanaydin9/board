@@ -20,6 +20,17 @@ export const getCurrentUser = async () => {
 };
 
 /**
+ * Kullanıcı kaydı
+ */
+export const signUp = async (email, password) => {
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+  });
+  return { data, error };
+};
+
+/**
  * Kullanıcı girişi
  */
 export const signIn = async (email, password) => {
@@ -54,9 +65,11 @@ export const getColumns = async () => {
  * Yeni kolon oluştur
  */
 export const createColumn = async (title, order) => {
+  const { data: { user } } = await supabase.auth.getUser();
+  
   const { data, error } = await supabase
     .from('columns')
-    .insert([{ title, order }])
+    .insert([{ title, order, user_id: user?.id }])
     .select()
     .single();
   
@@ -105,9 +118,11 @@ export const getCards = async () => {
  * Yeni kart oluştur
  */
 export const createCard = async (title, description, price, column_id, order) => {
+  const { data: { user } } = await supabase.auth.getUser();
+  
   const { data, error } = await supabase
     .from('cards')
-    .insert([{ title, description, price, column_id, order }])
+    .insert([{ title, description, price, column_id, order, user_id: user?.id }])
     .select()
     .single();
   

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { getCurrentUser } from './lib/supabase';
 import Login from './components/Login';
+import SignUp from './components/SignUp';
 import Board from './components/Board';
 import './App.css';
 
@@ -11,6 +12,7 @@ import './App.css';
 function App() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [showSignUp, setShowSignUp] = useState(false);
 
   // Sayfa yüklendiğinde mevcut kullanıcıyı kontrol et
   useEffect(() => {
@@ -31,6 +33,10 @@ function App() {
     setUser(null);
   };
 
+  const handleSignUpSuccess = () => {
+    setShowSignUp(false);
+  };
+
   if (loading) {
     return (
       <div className="app-loading">
@@ -43,8 +49,16 @@ function App() {
     <div className="app">
       {user ? (
         <Board user={user} onLogout={handleLogout} />
+      ) : showSignUp ? (
+        <SignUp 
+          onSignUpSuccess={handleSignUpSuccess}
+          onBackToLogin={() => setShowSignUp(false)}
+        />
       ) : (
-        <Login onLoginSuccess={handleLoginSuccess} />
+        <Login 
+          onLoginSuccess={handleLoginSuccess}
+          onSwitchToSignUp={() => setShowSignUp(true)}
+        />
       )}
     </div>
   );
