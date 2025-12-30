@@ -1,0 +1,272 @@
+/* Board Stilleri */
+
+.board-container {
+  min-height: 100vh;
+  background: #0f172a;
+  padding: 16px;
+}
+
+.board-header {
+  background: #1e293b;
+  border-radius: 6px;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  border: 1px solid #334155;
+  position: relative;
+}
+
+.board-header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.board-header-right {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.board-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #e2e8f0;
+  margin: 0;
+}
+
+.board-user {
+  font-size: 12px;
+  color: #94a3b8;
+  padding: 4px 10px;
+  background: #0f172a;
+  border-radius: 4px;
+  font-weight: 500;
+  border: 1px solid #334155;
+}
+
+.logout-button {
+  padding: 10px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #f87171;
+  background: transparent;
+  border: 1px solid #dc2626;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logout-button:hover {
+  background: #dc2626;
+  color: white;
+}
+
+.board-wrapper {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.board-columns {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  flex: 1;
+  padding-bottom: 16px;
+  align-items: flex-start;
+}
+
+.board-columns::-webkit-scrollbar {
+  height: 8px;
+}
+
+.board-columns::-webkit-scrollbar-track {
+  background: #1e293b;
+  border-radius: 4px;
+}
+
+.board-columns::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 4px;
+}
+
+.board-columns::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
+
+.board-loading {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #0f172a;
+  gap: 16px;
+}
+
+.board-loading p {
+  color: #94a3b8;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.loading-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid #334155;
+  border-top-color: #3b82f6;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Add Column Styles */
+.add-column-container {
+  flex-shrink: 0;
+  width: 240px;
+}
+
+.add-column-button {
+  width: 100%;
+  padding: 10px;
+  background: #1e293b;
+  border: 1px dashed #475569;
+  border-radius: 6px;
+  color: #94a3b8;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.add-column-button:hover {
+  background: #334155;
+  border-color: #64748b;
+  color: #e2e8f0;
+}
+
+.add-column-form {
+  background: #1e293b;
+  border-radius: 6px;
+  padding: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border: 1px solid #334155;
+}
+
+.add-column-input {
+  padding: 8px 10px;
+  font-size: 13px;
+  font-weight: 500;
+  border: 1px solid #475569;
+  border-radius: 4px;
+  outline: none;
+  transition: all 0.2s ease;
+  background: #0f172a;
+  color: #e2e8f0;
+}
+
+.add-column-input:focus {
+  border-color: #64748b;
+  background: #1e293b;
+}
+
+.add-column-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.add-column-submit,
+.add-column-cancel {
+  flex: 1;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.add-column-submit {
+  background: #3b82f6;
+  color: white;
+}
+
+.add-column-submit:hover {
+  background: #2563eb;
+}
+
+.add-column-cancel {
+  background: #334155;
+  color: #94a3b8;
+}
+
+.add-column-cancel:hover {
+  background: #475569;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .board-container {
+    padding: 12px;
+  }
+
+  .board-header {
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-start;
+    padding: 12px;
+  }
+
+  .board-header-left {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  .board-header-right {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .board-title {
+    font-size: 15px;
+  }
+
+  .logout-button {
+    width: 100%;
+  }
+
+  .board-wrapper {
+    flex-direction: column;
+  }
+
+  .board-columns {
+    gap: 12px;
+  }
+
+  .add-column-container {
+    width: 100%;
+  }
+}
+
