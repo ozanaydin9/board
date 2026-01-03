@@ -36,8 +36,8 @@ function Login({ onLoginSuccess, onSwitchToSignUp }) {
     <div className="login-container">
       <div className="login-box">
         <div className="login-header">
-          <h1>Board App</h1>
-          <p>Projelerinizi yönetin</p>
+          <div className="logo">🍒</div>
+          <h1>TaskCherry</h1>
         </div>
 
         <form onSubmit={handleSubmit} className="login-form">

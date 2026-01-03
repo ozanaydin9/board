@@ -1,6 +1,6 @@
-# 📋 Board App - Jira/Trello Benzeri Proje Yönetim Uygulaması
+# 🍒 TaskCherry - Görev Yönetim Uygulaması
 
-Modern, akıcı ve etkileyici bir board uygulaması. React + JavaScript ile geliştirilmiştir.
+Görevlerinizi tatlı bir şekilde yönetin! Modern, akıcı ve özelleştirilebilir kanban board uygulaması. React + JavaScript ile geliştirilmiştir.
 
 ## ✨ Özellikler
 

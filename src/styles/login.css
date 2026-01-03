@@ -36,10 +36,28 @@
   margin-bottom: 24px;
 }
 
+.login-header .logo {
+  font-size: 48px;
+  animation: bounce 2s ease-in-out infinite;
+  display: inline-block;
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
 .login-header h1 {
-  font-size: 22px;
+  font-size: 24px;
   font-weight: 700;
-  color: #e2e8f0;
+  background: linear-gradient(135deg, #ffffff, #cd1931);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   margin: 0 0 8px 0;
 }
 
@@ -102,7 +120,7 @@
   font-size: 13px;
   font-weight: 600;
   color: white;
-  background: #3b82f6;
+  background: linear-gradient(135deg, #ffffff, #cd1931);
   border: none;
   border-radius: 4px;
   cursor: pointer;
@@ -111,7 +129,7 @@
 }
 
 .login-button:hover:not(:disabled) {
-  background: #2563eb;
+  background: #cd1931;
 }
 
 .login-button:disabled {

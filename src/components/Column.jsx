@@ -9,7 +9,7 @@ import '../styles/column.css';
  * Column Component
  * Kartların bulunduğu kolon bileşeni
  */
-function Column({ column, cards, onAddCard, onUpdateCard, onDeleteCard, onUpdateColumn, onDeleteColumn, autoEdit = false, onEditComplete }) {
+function Column({ column, cards, onAddCard, onUpdateCard, onDeleteCard, onUpdateColumn, onDeleteColumn, onMoveCardToPin, hasPinnedColumns, maxStars = 5, autoEdit = false, onEditComplete }) {
   const [isAddingCard, setIsAddingCard] = useState(false);
   const [isEditingTitle, setIsEditingTitle] = useState(autoEdit);
   const [newCardTitle, setNewCardTitle] = useState('');
@@ -92,6 +92,10 @@ function Column({ column, cards, onAddCard, onUpdateCard, onDeleteCard, onUpdate
     setShowDeleteModal(false);
   };
 
+  const handleTogglePin = async () => {
+    await onUpdateColumn(column.id, { pinned: !column.pinned });
+  };
+
   return (
     <div className="column">
       <div className="column-header">
@@ -112,9 +116,19 @@ function Column({ column, cards, onAddCard, onUpdateCard, onDeleteCard, onUpdate
           </div>
         ) : (
           <div className="column-title-wrapper">
-            <h3 className="column-title">{column.title}</h3>
+            <h3 className="column-title">
+              {column.pinned && <span className="pin-icon" title="Sabitlenmiş">📌</span>}
+              {column.title}
+            </h3>
             <div className="column-header-right">
               <div className="column-actions">
+                <button
+                  onClick={handleTogglePin}
+                  className={`column-action-btn column-pin-btn ${column.pinned ? 'pinned' : ''}`}
+                  title={column.pinned ? "Sabitlemeyi kaldır" : "Sağa sabitle"}
+                >
+                  {column.pinned ? '📍' : '📌'}
+                </button>
                 <button
                   onClick={() => setIsEditingTitle(true)}
                   className="column-action-btn"
@@ -169,6 +183,9 @@ function Column({ column, cards, onAddCard, onUpdateCard, onDeleteCard, onUpdate
               card={card}
               onUpdate={onUpdateCard}
               onDelete={onDeleteCard}
+              onMoveToPin={onMoveCardToPin}
+              hasPinnedColumns={hasPinnedColumns && !column.pinned}
+              maxStars={maxStars}
             />
           ))}
         </SortableContext>

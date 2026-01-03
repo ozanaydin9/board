@@ -64,12 +64,12 @@ export const getColumns = async () => {
 /**
  * Yeni kolon oluştur
  */
-export const createColumn = async (title, order) => {
+export const createColumn = async (title, order, pinned = false) => {
   const { data: { user } } = await supabase.auth.getUser();
   
   const { data, error } = await supabase
     .from('columns')
-    .insert([{ title, order, user_id: user?.id }])
+    .insert([{ title, order, pinned, user_id: user?.id }])
     .select()
     .single();
   
@@ -151,6 +151,133 @@ export const deleteCard = async (id) => {
     .from('cards')
     .delete()
     .eq('id', id);
+  
+  return { error };
+};
+
+/**
+ * Kullanıcı ayarlarını getir
+ */
+export const getUserSettings = async () => {
+  const { data: { user } } = await supabase.auth.getUser();
+  
+  if (!user) {
+    return { data: null, error: new Error('User not authenticated') };
+  }
+
+  const { data, error } = await supabase
+    .from('user_settings')
+    .select('*')
+    .eq('user_id', user.id)
+    .single();
+  
+  // Eğer ayar yoksa varsayılan değer döndür
+  if (error && error.code === 'PGRST116') {
+    return { data: { star_count: 5 }, error: null };
+  }
+  
+  return { data, error };
+};
+
+/**
+ * Kullanıcı ayarlarını güncelle veya oluştur
+ */
+export const updateUserSettings = async (settings) => {
+  const { data: { user } } = await supabase.auth.getUser();
+  
+  if (!user) {
+    return { data: null, error: new Error('User not authenticated') };
+  }
+
+  const { data, error } = await supabase
+    .from('user_settings')
+    .upsert(
+      { user_id: user.id, ...settings },
+      { onConflict: 'user_id' }
+    )
+    .select()
+    .single();
+  
+  return { data, error };
+};
+
+/**
+ * Kullanıcı widget'larını getir
+ */
+export const getUserWidgets = async () => {
+  const { data: { user } } = await supabase.auth.getUser();
+  
+  if (!user) {
+    return { data: [], error: new Error('User not authenticated') };
+  }
+
+  const { data, error } = await supabase
+    .from('user_widgets')
+    .select('*')
+    .eq('user_id', user.id)
+    .order('order', { ascending: true });
+  
+  return { data: data || [], error };
+};
+
+/**
+ * Widget oluştur
+ */
+export const createWidget = async (widgetData) => {
+  const { data: { user } } = await supabase.auth.getUser();
+  
+  if (!user) {
+    return { data: null, error: new Error('User not authenticated') };
+  }
+
+  const { data, error } = await supabase
+    .from('user_widgets')
+    .insert([{ user_id: user.id, ...widgetData }])
+    .select()
+    .single();
+  
+  return { data, error };
+};
+
+/**
+ * Widget güncelle
+ */
+export const updateWidget = async (id, updates) => {
+  const { data, error } = await supabase
+    .from('user_widgets')
+    .update(updates)
+    .eq('id', id)
+    .select()
+    .single();
+  
+  return { data, error };
+};
+
+/**
+ * Widget sil
+ */
+export const deleteWidget = async (id) => {
+  const { error } = await supabase
+    .from('user_widgets')
+    .delete()
+    .eq('id', id);
+  
+  return { error };
+};
+
+/**
+ * Varsayılan widget'ları oluştur
+ */
+export const createDefaultWidgets = async () => {
+  const { data: { user } } = await supabase.auth.getUser();
+  
+  if (!user) {
+    return { error: new Error('User not authenticated') };
+  }
+
+  const { error } = await supabase.rpc('create_default_widgets', {
+    p_user_id: user.id
+  });
   
   return { error };
 };

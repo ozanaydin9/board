@@ -53,11 +53,12 @@ function SignUp({ onSignUpSuccess, onBackToLogin }) {
   if (success) {
     return (
       <div className="login-container">
-        <div className="login-box">
-          <div className="login-header">
-            <h1>✅ Kayıt Başarılı!</h1>
-            <p>Email adresinizi doğrulayın</p>
-          </div>
+      <div className="login-box">
+        <div className="login-header">
+          <div className="logo">✅</div>
+          <h1>Kayıt Başarılı!</h1>
+          <p>Email adresinizi doğrulayın</p>
+        </div>
           <div style={{ textAlign: 'center', padding: '20px', color: '#94a3b8' }}>
             <p>Kayıt işleminiz tamamlandı.</p>
             <p>Email adresinize gönderilen doğrulama linkine tıklayın.</p>
@@ -74,8 +75,9 @@ function SignUp({ onSignUpSuccess, onBackToLogin }) {
     <div className="login-container">
       <div className="login-box">
         <div className="login-header">
-          <h1>Kayıt Ol</h1>
-          <p>Board App'e katılın</p>
+          <div className="logo">🍒</div>
+          <h1>TaskCherry</h1>
+          <p>Görevlerinizi yönetmeye başlayın</p>
         </div>
 
         <form onSubmit={handleSubmit} className="login-form">

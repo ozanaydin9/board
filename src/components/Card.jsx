@@ -8,12 +8,14 @@ import '../styles/card.css';
  * Card Component
  * Drag & drop özellikli kart bileşeni
  */
-function Card({ card, onUpdate, onDelete }) {
+function Card({ card, onUpdate, onDelete, onMoveToPin, hasPinnedColumns, maxStars = 5 }) {
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState(card.title);
   const [editDescription, setEditDescription] = useState(card.description || '');
   const [editPrice, setEditPrice] = useState(card.price || 0);
+  const [editPriority, setEditPriority] = useState(card.priority || 0);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [hoverPriority, setHoverPriority] = useState(0);
 
   const {
     attributes,
@@ -43,6 +45,7 @@ function Card({ card, onUpdate, onDelete }) {
       title: editTitle,
       description: editDescription,
       price: parseFloat(editPrice) || 0,
+      priority: editPriority || null,
     });
     setIsEditing(false);
   };
@@ -51,6 +54,7 @@ function Card({ card, onUpdate, onDelete }) {
     setEditTitle(card.title);
     setEditDescription(card.description || '');
     setEditPrice(card.price || 0);
+    setEditPriority(card.priority || 0);
     setIsEditing(false);
   };
 
@@ -61,6 +65,13 @@ function Card({ card, onUpdate, onDelete }) {
   const handleDeleteConfirm = async () => {
     await onDelete(card.id);
     setShowDeleteModal(false);
+  };
+
+  const handleMoveToPin = (e) => {
+    e.stopPropagation();
+    if (onMoveToPin) {
+      onMoveToPin(card.id);
+    }
   };
 
   if (isEditing) {
@@ -91,6 +102,36 @@ function Card({ card, onUpdate, onDelete }) {
             step="0.01"
             min="0"
           />
+          
+          {/* Öncelik Seçici */}
+          <div className="priority-selector">
+            <label className="priority-selector-label">Öncelik:</label>
+            <div className="priority-stars-selector">
+              {Array.from({ length: maxStars }, (_, i) => i + 1).map((star) => (
+                <button
+                  key={star}
+                  type="button"
+                  className={`star-btn ${star <= (hoverPriority || editPriority) ? 'filled' : ''}`}
+                  onClick={() => setEditPriority(editPriority === star ? 0 : star)}
+                  onMouseEnter={() => setHoverPriority(star)}
+                  onMouseLeave={() => setHoverPriority(0)}
+                >
+                  ★
+                </button>
+              ))}
+              {editPriority > 0 && (
+                <button
+                  type="button"
+                  className="clear-priority-btn"
+                  onClick={() => setEditPriority(0)}
+                  title="Önceliği kaldır"
+                >
+                  ✕
+                </button>
+              )}
+            </div>
+          </div>
+
           <div className="card-edit-actions">
             <button onClick={handleSave} className="card-save-btn">
               Kaydet
@@ -115,6 +156,15 @@ function Card({ card, onUpdate, onDelete }) {
       <div className="card-header">
         <h4 className="card-title">{card.title}</h4>
         <div className="card-actions">
+          {hasPinnedColumns && (
+            <button
+              onClick={handleMoveToPin}
+              className="card-action-btn card-complete-icon"
+              title="Pinli kolona taşı"
+            >
+              ✓
+            </button>
+          )}
           <button
             onClick={(e) => {
               e.stopPropagation();
@@ -152,11 +202,32 @@ function Card({ card, onUpdate, onDelete }) {
       {card.description && (
         <p className="card-description">{card.description}</p>
       )}
-      
-      {card.price > 0 && (
-        <div className="card-price">
-          <span className="price-label">Fiyat:</span>
-          <span className="price-value">₺{card.price.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+
+      {/* Alt kısım: Sol tarafta yıldızlar, sağ tarafta fiyat */}
+      {(card.priority > 0 || card.price > 0) && (
+        <div className="card-footer-info">
+          {/* Sol: Öncelik Yıldızları */}
+          <div className="card-priority">
+            {card.priority > 0 && (
+              <div className="priority-stars-display">
+                {Array.from({ length: maxStars }, (_, i) => i + 1).map((star) => (
+                  <span
+                    key={star}
+                    className={`star ${star <= card.priority ? 'filled' : ''}`}
+                  >
+                    ★
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+          
+          {/* Sağ: Fiyat */}
+          {card.price > 0 && (
+            <div className="card-price">
+              ₺{card.price.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            </div>
+          )}
         </div>
       )}
     </div>
