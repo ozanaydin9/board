@@ -6,7 +6,7 @@ const DOMAIN_CONFIG = {
     title: 'TaskCherry',
     loginTitle: 'TaskCherry',
     loginSubtitle: 'Görevlerinizi TaskCherry ile yönetin',
-    favicon: '/vite.svg',
+    favicon: '/cherry-favicon.svg',
     primaryColor: '#3b82f6',
     logo: '🍒', // Default emoji logo
   },
@@ -56,7 +56,7 @@ const DOMAIN_CONFIG = {
     title: 'TaskCherry',
     loginTitle: 'TaskCherry',
     loginSubtitle: 'Görevlerinizi TaskCherry ile yönetin',
-    favicon: '/vite.svg',
+    favicon: '/cherry-favicon.svg',
     primaryColor: '#3b82f6',
     logo: '🍒', // Default emoji logo
   },
