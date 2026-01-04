@@ -2,23 +2,32 @@ import { useState, useEffect } from 'react';
 import '../styles/modal.css';
 
 const WIDGET_TYPES = [
-  { value: 'total_cards', label: 'Toplam Kart Sayısı', icon: '📊', needsColumn: false },
-  { value: 'total_price', label: 'Toplam Değer', icon: '💰', needsColumn: false },
-  { value: 'high_priority', label: 'Yüksek Öncelikli', icon: '⭐', needsColumn: false },
-  { value: 'column_count', label: 'Kolon Sayısı', icon: '📋', needsColumn: false },
-  { value: 'column_cards', label: 'Kolonun Kart Sayısı', icon: '📝', needsColumn: true },
-  { value: 'column_total', label: 'Kolonun Toplam Fiyatı', icon: '💵', needsColumn: true },
-  { value: 'pinned_total', label: 'Pinli Kolonlar Toplamı', icon: '📌', needsColumn: false },
-  { value: 'average_price', label: 'Ortalama Fiyat', icon: '📈', needsColumn: false },
+  { value: 'total_cards', label: 'Toplam Kart Sayısı', icon: '📊', needsColumn: false, needsCustomText: false, needsTarget: false },
+  { value: 'total_price', label: 'Toplam Değer', icon: '💰', needsColumn: false, needsCustomText: false, needsTarget: false },
+  { value: 'high_priority', label: 'Yüksek Öncelikli', icon: '⭐', needsColumn: false, needsCustomText: false, needsTarget: false },
+  { value: 'column_count', label: 'Kolon Sayısı', icon: '📋', needsColumn: false, needsCustomText: false, needsTarget: false },
+  { value: 'column_cards', label: 'Kolonun Kart Sayısı', icon: '📝', needsColumn: true, needsCustomText: false, needsTarget: false },
+  { value: 'column_total', label: 'Kolonun Toplam Fiyatı', icon: '💵', needsColumn: true, needsCustomText: false, needsTarget: false },
+  { value: 'pinned_total', label: 'Pinli Kolonlar Toplamı', icon: '📌', needsColumn: false, needsCustomText: false, needsTarget: false },
+  { value: 'average_price', label: 'Ortalama Fiyat', icon: '📈', needsColumn: false, needsCustomText: false, needsTarget: false },
+  { value: 'custom_text', label: 'Özel Metin/Sayı', icon: '✏️', needsColumn: false, needsCustomText: true, needsTarget: false },
+  { value: 'target_remaining', label: 'Hedef - Kolon Farkı', icon: '🎯', needsColumn: true, needsCustomText: false, needsTarget: true },
 ];
 
 const COLOR_THEMES = [
-  { value: 'blue', label: 'Mavi', class: 'widget-blue' },
-  { value: 'green', label: 'Yeşil', class: 'widget-green' },
-  { value: 'orange', label: 'Turuncu', class: 'widget-orange' },
-  { value: 'purple', label: 'Mor', class: 'widget-purple' },
-  { value: 'red', label: 'Kırmızı', class: 'widget-red' },
-  { value: 'yellow', label: 'Sarı', class: 'widget-yellow' },
+  { value: 'blue', label: 'Mavi', class: 'widget-blue', baseColor: '#3b82f6' },
+  { value: 'green', label: 'Yeşil', class: 'widget-green', baseColor: '#22c55e' },
+  { value: 'orange', label: 'Turuncu', class: 'widget-orange', baseColor: '#f97316' },
+  { value: 'purple', label: 'Mor', class: 'widget-purple', baseColor: '#8b5cf6' },
+  { value: 'red', label: 'Kırmızı', class: 'widget-red', baseColor: '#ef4444' },
+  { value: 'yellow', label: 'Sarı', class: 'widget-yellow', baseColor: '#eab308' },
+  { value: 'pink', label: 'Pembe', class: 'widget-pink', baseColor: '#ec4899' },
+  { value: 'cyan', label: 'Cyan', class: 'widget-cyan', baseColor: '#06b6d4' },
+  { value: 'indigo', label: 'İndigo', class: 'widget-indigo', baseColor: '#6366f1' },
+  { value: 'teal', label: 'Teal', class: 'widget-teal', baseColor: '#14b8a6' },
+  { value: 'lime', label: 'Lime', class: 'widget-lime', baseColor: '#84cc16' },
+  { value: 'rose', label: 'Gül', class: 'widget-rose', baseColor: '#f43f5e' },
+  { value: 'custom', label: 'Özel Renk', class: 'widget-custom', baseColor: '#3b82f6' },
 ];
 
 /**
@@ -30,7 +39,10 @@ function WidgetModal({ isOpen, widget = null, columns = [], onSave, onCancel }) 
   const [title, setTitle] = useState('');
   const [icon, setIcon] = useState('📊');
   const [color, setColor] = useState('blue');
+  const [customColor, setCustomColor] = useState('#3b82f6');
   const [columnId, setColumnId] = useState('');
+  const [customText, setCustomText] = useState('');
+  const [targetValue, setTargetValue] = useState('');
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -40,7 +52,10 @@ function WidgetModal({ isOpen, widget = null, columns = [], onSave, onCancel }) 
       setTitle(widget.title);
       setIcon(widget.icon);
       setColor(widget.settings?.color || 'blue');
+      setCustomColor(widget.settings?.customColor || '#3b82f6');
       setColumnId(widget.settings?.column_id || '');
+      setCustomText(widget.settings?.customText || '');
+      setTargetValue(widget.settings?.targetValue || '');
     } else {
       // Yeni widget
       const selectedType = WIDGET_TYPES.find(t => t.value === widgetType);
@@ -65,8 +80,14 @@ function WidgetModal({ isOpen, widget = null, columns = [], onSave, onCancel }) 
     }
 
     const selectedType = WIDGET_TYPES.find(t => t.value === widgetType);
+    
     if (selectedType?.needsColumn && !columnId) {
       alert('Lütfen bir kolon seçin');
+      return;
+    }
+
+    if (selectedType?.needsTarget && !targetValue) {
+      alert('Lütfen hedef değer girin');
       return;
     }
 
@@ -78,7 +99,10 @@ function WidgetModal({ isOpen, widget = null, columns = [], onSave, onCancel }) 
       icon,
       settings: {
         color,
-        ...(columnId && { column_id: columnId })
+        ...(color === 'custom' && { customColor }),
+        ...(columnId && { column_id: columnId }),
+        ...(customText && { customText }),
+        ...(targetValue && { targetValue: parseFloat(targetValue.replace(/,/g, '')) || 0 })
       }
     };
 
@@ -153,17 +177,71 @@ function WidgetModal({ isOpen, widget = null, columns = [], onSave, onCancel }) 
                   onClick={() => setColor(theme.value)}
                   className={`color-option ${color === theme.value ? 'active' : ''} ${theme.class}`}
                   title={theme.label}
+                  style={theme.value === 'custom' ? {
+                    background: `linear-gradient(135deg, ${customColor}33, ${customColor}22)`
+                  } : {}}
                 >
                   <span className="color-check">{color === theme.value ? '✓' : ''}</span>
                 </button>
               ))}
             </div>
+            
+            {/* Custom Renk Seçici */}
+            {color === 'custom' && (
+              <div className="custom-color-picker">
+                <label className="custom-color-label">Özel Renk Seçin:</label>
+                <input
+                  type="color"
+                  value={customColor}
+                  onChange={(e) => setCustomColor(e.target.value)}
+                  className="color-input"
+                />
+                <span className="color-preview" style={{
+                  background: `linear-gradient(135deg, ${customColor}, ${customColor}dd)`
+                }}>
+                  Önizleme
+                </span>
+              </div>
+            )}
           </div>
+
+          {/* Özel Metin (custom_text için) */}
+          {selectedType?.needsCustomText && (
+            <div className="form-group">
+              <label className="form-label">Değer (Metin veya Sayı)</label>
+              <input
+                type="text"
+                value={customText}
+                onChange={(e) => setCustomText(e.target.value)}
+                placeholder="Örn: 500GB, %75, 1500 adet"
+                className="form-input"
+                maxLength={20}
+              />
+              <p className="form-hint">Widget'ta gösterilecek değeri girin</p>
+            </div>
+          )}
+
+          {/* Hedef Değer (gerekirse) */}
+          {selectedType?.needsTarget && (
+            <div className="form-group">
+              <label className="form-label">Hedef Değer</label>
+              <input
+                type="text"
+                value={targetValue}
+                onChange={(e) => setTargetValue(e.target.value)}
+                placeholder="Örn: 1333333 veya 1,333,333"
+                className="form-input"
+              />
+              <p className="form-hint">Hedef kotanızı veya bütçenizi girin</p>
+            </div>
+          )}
 
           {/* Kolon Seçimi (gerekirse) */}
           {selectedType?.needsColumn && (
             <div className="form-group">
-              <label className="form-label">Kolon Seçin</label>
+              <label className="form-label">
+                {selectedType?.needsTarget ? 'Çıkarılacak Kolon' : 'Kolon Seçin'}
+              </label>
               <select
                 value={columnId}
                 onChange={(e) => setColumnId(e.target.value)}
@@ -176,6 +254,9 @@ function WidgetModal({ isOpen, widget = null, columns = [], onSave, onCancel }) 
                   </option>
                 ))}
               </select>
+              {selectedType?.needsTarget && (
+                <p className="form-hint">Bu kolonun toplam fiyatı hedef değerden çıkarılacak</p>
+              )}
             </div>
           )}
         </div>

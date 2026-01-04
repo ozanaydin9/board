@@ -204,6 +204,156 @@
   background: linear-gradient(90deg, #eab308, #ca8a04);
 }
 
+/* Pembe tema */
+.widget-pink {
+  background: linear-gradient(135deg, rgba(236, 72, 153, 0.12), rgba(219, 39, 119, 0.12));
+  border: 1px solid rgba(236, 72, 153, 0.3);
+}
+
+.widget-pink:hover {
+  background: linear-gradient(135deg, rgba(236, 72, 153, 0.18), rgba(219, 39, 119, 0.18));
+  border-color: rgba(236, 72, 153, 0.5);
+  box-shadow: 0 4px 16px rgba(236, 72, 153, 0.25);
+}
+
+.widget-pink .gradient-icon-box {
+  background: rgba(236, 72, 153, 0.2);
+}
+
+.widget-pink .gradient-value {
+  color: #f472b6;
+}
+
+.widget-pink .progress-bar {
+  background: linear-gradient(90deg, #ec4899, #db2777);
+}
+
+/* Cyan tema */
+.widget-cyan {
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.12), rgba(8, 145, 178, 0.12));
+  border: 1px solid rgba(6, 182, 212, 0.3);
+}
+
+.widget-cyan:hover {
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.18), rgba(8, 145, 178, 0.18));
+  border-color: rgba(6, 182, 212, 0.5);
+  box-shadow: 0 4px 16px rgba(6, 182, 212, 0.25);
+}
+
+.widget-cyan .gradient-icon-box {
+  background: rgba(6, 182, 212, 0.2);
+}
+
+.widget-cyan .gradient-value {
+  color: #22d3ee;
+}
+
+.widget-cyan .progress-bar {
+  background: linear-gradient(90deg, #06b6d4, #0891b2);
+}
+
+/* İndigo tema */
+.widget-indigo {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.12), rgba(79, 70, 229, 0.12));
+  border: 1px solid rgba(99, 102, 241, 0.3);
+}
+
+.widget-indigo:hover {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.18), rgba(79, 70, 229, 0.18));
+  border-color: rgba(99, 102, 241, 0.5);
+  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.25);
+}
+
+.widget-indigo .gradient-icon-box {
+  background: rgba(99, 102, 241, 0.2);
+}
+
+.widget-indigo .gradient-value {
+  color: #818cf8;
+}
+
+.widget-indigo .progress-bar {
+  background: linear-gradient(90deg, #6366f1, #4f46e5);
+}
+
+/* Teal tema */
+.widget-teal {
+  background: linear-gradient(135deg, rgba(20, 184, 166, 0.12), rgba(13, 148, 136, 0.12));
+  border: 1px solid rgba(20, 184, 166, 0.3);
+}
+
+.widget-teal:hover {
+  background: linear-gradient(135deg, rgba(20, 184, 166, 0.18), rgba(13, 148, 136, 0.18));
+  border-color: rgba(20, 184, 166, 0.5);
+  box-shadow: 0 4px 16px rgba(20, 184, 166, 0.25);
+}
+
+.widget-teal .gradient-icon-box {
+  background: rgba(20, 184, 166, 0.2);
+}
+
+.widget-teal .gradient-value {
+  color: #2dd4bf;
+}
+
+.widget-teal .progress-bar {
+  background: linear-gradient(90deg, #14b8a6, #0d9488);
+}
+
+/* Lime tema */
+.widget-lime {
+  background: linear-gradient(135deg, rgba(132, 204, 22, 0.12), rgba(101, 163, 13, 0.12));
+  border: 1px solid rgba(132, 204, 22, 0.3);
+}
+
+.widget-lime:hover {
+  background: linear-gradient(135deg, rgba(132, 204, 22, 0.18), rgba(101, 163, 13, 0.18));
+  border-color: rgba(132, 204, 22, 0.5);
+  box-shadow: 0 4px 16px rgba(132, 204, 22, 0.25);
+}
+
+.widget-lime .gradient-icon-box {
+  background: rgba(132, 204, 22, 0.2);
+}
+
+.widget-lime .gradient-value {
+  color: #a3e635;
+}
+
+.widget-lime .progress-bar {
+  background: linear-gradient(90deg, #84cc16, #65a30d);
+}
+
+/* Rose tema */
+.widget-rose {
+  background: linear-gradient(135deg, rgba(244, 63, 94, 0.12), rgba(225, 29, 72, 0.12));
+  border: 1px solid rgba(244, 63, 94, 0.3);
+}
+
+.widget-rose:hover {
+  background: linear-gradient(135deg, rgba(244, 63, 94, 0.18), rgba(225, 29, 72, 0.18));
+  border-color: rgba(244, 63, 94, 0.5);
+  box-shadow: 0 4px 16px rgba(244, 63, 94, 0.25);
+}
+
+.widget-rose .gradient-icon-box {
+  background: rgba(244, 63, 94, 0.2);
+}
+
+.widget-rose .gradient-value {
+  color: #fb7185;
+}
+
+.widget-rose .progress-bar {
+  background: linear-gradient(90deg, #f43f5e, #e11d48);
+}
+
+/* Custom renk için hover efekti */
+.widget-custom:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.1);
+}
+
 /* Widget menü */
 .widget-menu-wrapper {
   position: absolute;

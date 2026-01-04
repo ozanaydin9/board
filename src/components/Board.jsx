@@ -127,7 +127,7 @@ function Board({ user, onLogout }) {
       console.error('Kolon oluşturulamadı:', error);
       alert('Kolon oluşturulurken bir hata oluştu.');
     } else if (data) {
-      setColumns([...columns, data]);
+      setColumns(prevColumns => [...prevColumns, data]);
       setEditingColumnId(data.id);
     }
   };
@@ -140,7 +140,7 @@ function Board({ user, onLogout }) {
       console.error('Kolon güncellenemedi:', error);
       alert('Kolon güncellenirken bir hata oluştu.');
     } else if (data) {
-      setColumns(columns.map(col => col.id === columnId ? data : col));
+      setColumns(prevColumns => prevColumns.map(col => col.id === columnId ? data : col));
     }
   };
 
@@ -152,7 +152,7 @@ function Board({ user, onLogout }) {
       console.error('Kolon silinemedi:', error);
       alert('Kolon silinirken bir hata oluştu.');
     } else {
-      setColumns(columns.filter(col => col.id !== columnId));
+      setColumns(prevColumns => prevColumns.filter(col => col.id !== columnId));
     }
   };
 
@@ -170,7 +170,7 @@ function Board({ user, onLogout }) {
       console.error('Kart oluşturulamadı:', error);
       alert('Kart oluşturulurken bir hata oluştu.');
     } else if (data) {
-      setCards([...cards, data]);
+      setCards(prevCards => [...prevCards, data]);
     }
   };
 
@@ -182,7 +182,7 @@ function Board({ user, onLogout }) {
       console.error('Kart güncellenemedi:', error);
       alert('Kart güncellenirken bir hata oluştu.');
     } else if (data) {
-      setCards(cards.map(card => card.id === cardId ? data : card));
+      setCards(prevCards => prevCards.map(card => card.id === cardId ? data : card));
     }
   };
 
@@ -194,7 +194,7 @@ function Board({ user, onLogout }) {
       console.error('Kart silinemedi:', error);
       alert('Kart silinirken bir hata oluştu.');
     } else {
-      setCards(cards.filter(card => card.id !== cardId));
+      setCards(prevCards => prevCards.filter(card => card.id !== cardId));
     }
   };
 
@@ -345,7 +345,7 @@ function Board({ user, onLogout }) {
       if (error) {
         alert('Widget güncellenirken hata oluştu.');
       } else if (data) {
-        setWidgets(widgets.map(w => w.id === editingWidget.id ? data : w));
+        setWidgets(prevWidgets => prevWidgets.map(w => w.id === editingWidget.id ? data : w));
         setShowWidgetModal(false);
         setEditingWidget(null);
       }
@@ -363,7 +363,7 @@ function Board({ user, onLogout }) {
       if (error) {
         alert('Widget eklenirken hata oluştu.');
       } else if (data) {
-        setWidgets([...widgets, data]);
+        setWidgets(prevWidgets => [...prevWidgets, data]);
         setShowWidgetModal(false);
       }
     }
@@ -376,7 +376,7 @@ function Board({ user, onLogout }) {
     if (error) {
       alert('Widget silinirken hata oluştu.');
     } else {
-      setWidgets(widgets.filter(w => w.id !== widgetId));
+      setWidgets(prevWidgets => prevWidgets.filter(w => w.id !== widgetId));
     }
   };
 
@@ -386,18 +386,21 @@ function Board({ user, onLogout }) {
     
     if (!over || active.id === over.id) return;
     
-    const oldIndex = widgets.findIndex(w => w.id === active.id);
-    const newIndex = widgets.findIndex(w => w.id === over.id);
-    
-    const reorderedWidgets = arrayMove(widgets, oldIndex, newIndex);
-    
-    // UI'ı hemen güncelle
-    setWidgets(reorderedWidgets);
-    
-    // Veritabanını güncelle
-    for (let i = 0; i < reorderedWidgets.length; i++) {
-      await updateWidget(reorderedWidgets[i].id, { order: i + 1 });
-    }
+    setWidgets(prevWidgets => {
+      const oldIndex = prevWidgets.findIndex(w => w.id === active.id);
+      const newIndex = prevWidgets.findIndex(w => w.id === over.id);
+      
+      const reorderedWidgets = arrayMove(prevWidgets, oldIndex, newIndex);
+      
+      // Veritabanını güncelle (background)
+      setTimeout(async () => {
+        for (let i = 0; i < reorderedWidgets.length; i++) {
+          await updateWidget(reorderedWidgets[i].id, { order: i + 1 });
+        }
+      }, 0);
+      
+      return reorderedWidgets;
+    });
   };
 
   // Çıkış yap

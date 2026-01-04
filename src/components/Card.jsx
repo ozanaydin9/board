@@ -14,6 +14,7 @@ function Card({ card, onUpdate, onDelete, onMoveToPin, hasPinnedColumns, maxStar
   const [editDescription, setEditDescription] = useState(card.description || '');
   const [editPrice, setEditPrice] = useState(card.price || 0);
   const [editPriority, setEditPriority] = useState(card.priority || 0);
+  const [editNote, setEditNote] = useState(card.note || '');
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [hoverPriority, setHoverPriority] = useState(0);
 
@@ -46,6 +47,7 @@ function Card({ card, onUpdate, onDelete, onMoveToPin, hasPinnedColumns, maxStar
       description: editDescription,
       price: parseFloat(editPrice) || 0,
       priority: editPriority || null,
+      note: editNote.trim() || null,
     });
     setIsEditing(false);
   };
@@ -55,6 +57,7 @@ function Card({ card, onUpdate, onDelete, onMoveToPin, hasPinnedColumns, maxStar
     setEditDescription(card.description || '');
     setEditPrice(card.price || 0);
     setEditPriority(card.priority || 0);
+    setEditNote(card.note || '');
     setIsEditing(false);
   };
 
@@ -132,6 +135,19 @@ function Card({ card, onUpdate, onDelete, onMoveToPin, hasPinnedColumns, maxStar
             </div>
           </div>
 
+          {/* Not/Tarih Alanı */}
+          <div className="note-input-group">
+            <label className="note-input-label">📝 Kısa Not / Tarih</label>
+            <input
+              type="text"
+              value={editNote}
+              onChange={(e) => setEditNote(e.target.value)}
+              placeholder="Örn: 15 Ocak, Müşteri: Ali, v2.0"
+              className="note-input"
+              maxLength={40}
+            />
+          </div>
+
           <div className="card-edit-actions">
             <button onClick={handleSave} className="card-save-btn">
               Kaydet
@@ -199,8 +215,18 @@ function Card({ card, onUpdate, onDelete, onMoveToPin, hasPinnedColumns, maxStar
         isDanger={true}
       />
       
-      {card.description && (
-        <p className="card-description">{card.description}</p>
+      {/* Description ve Note yan yana */}
+      {(card.description || card.note) && (
+        <div className="card-description-row">
+          {card.description && (
+            <p className="card-description">{card.description}</p>
+          )}
+          {card.note && (
+            <div className="card-note-badge">
+              {card.note}
+            </div>
+          )}
+        </div>
       )}
 
       {/* Alt kısım: Sol tarafta yıldızlar, sağ tarafta fiyat */}

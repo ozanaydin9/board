@@ -4,17 +4,37 @@
 -- Bu dosyayı Supabase Dashboard > SQL Editor'de çalıştırın
 
 -- Widget tipleri için enum
-CREATE TYPE widget_type AS ENUM (
-  'total_cards',        -- Toplam kart sayısı
-  'total_price',        -- Toplam fiyat
-  'high_priority',      -- Yüksek öncelikli kartlar
-  'column_count',       -- Kolon sayısı
-  'column_cards',       -- Belirli kolonun kart sayısı
-  'column_total',       -- Belirli kolonun toplam fiyatı
-  'pinned_total',       -- Pinli kolonların toplamı
-  'average_price',      -- Ortalama kart fiyatı
-  'completed_cards'     -- Tamamlanan kartlar (belirli kolonda)
-);
+-- İlk çalıştırma veya güncelleme için güvenli versiyon
+DO $$ 
+BEGIN
+  -- Eğer widget_type enum yoksa oluştur
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'widget_type') THEN
+    CREATE TYPE widget_type AS ENUM (
+      'total_cards',
+      'total_price',
+      'high_priority',
+      'column_count',
+      'column_cards',
+      'column_total',
+      'pinned_total',
+      'average_price',
+      'completed_cards',
+      'custom_text',
+      'target_remaining'
+    );
+  ELSE
+    -- Enum zaten varsa, sadece yeni değerleri ekle (varsa hata vermez)
+    BEGIN
+      ALTER TYPE widget_type ADD VALUE IF NOT EXISTS 'custom_text';
+    EXCEPTION WHEN duplicate_object THEN NULL;
+    END;
+    
+    BEGIN
+      ALTER TYPE widget_type ADD VALUE IF NOT EXISTS 'target_remaining';
+    EXCEPTION WHEN duplicate_object THEN NULL;
+    END;
+  END IF;
+END $$;
 
 -- user_widgets tablosu
 CREATE TABLE IF NOT EXISTS public.user_widgets (

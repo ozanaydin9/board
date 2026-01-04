@@ -46,6 +46,22 @@ function DashboardWidget({ widget, cards, columns, onEdit, onDelete, isDragging 
         const avg = cards.reduce((sum, card) => sum + (parseFloat(card.price) || 0), 0) / cards.length;
         return `₺${(avg / 1000).toFixed(1)}K`;
       
+      case 'custom_text':
+        return widget.settings?.customText || '-';
+      
+      case 'target_remaining':
+        const targetValue = widget.settings?.targetValue || 0;
+        if (!widget.settings?.column_id) {
+          return `₺${targetValue.toLocaleString('tr-TR')}`;
+        }
+        
+        const columnSum = cards
+          .filter(card => card.column_id === widget.settings.column_id)
+          .reduce((sum, card) => sum + (parseFloat(card.price) || 0), 0);
+        
+        const remaining = targetValue - columnSum;
+        return `₺${remaining.toLocaleString('tr-TR')}`;
+      
       default:
         return 0;
     }
@@ -72,6 +88,19 @@ function DashboardWidget({ widget, cards, columns, onEdit, onDelete, isDragging 
           .reduce((sum, card) => sum + (parseFloat(card.price) || 0), 0);
         return (columnTotal / total * 100);
       
+      case 'target_remaining':
+        const targetVal = widget.settings?.targetValue || 0;
+        if (targetVal === 0 || !widget.settings?.column_id) return 0;
+        
+        const colSum = cards
+          .filter(card => card.column_id === widget.settings.column_id)
+          .reduce((sum, card) => sum + (parseFloat(card.price) || 0), 0);
+        
+        const rem = targetVal - colSum;
+        
+        // Kalan yüzdesi (ne kadar kaldı) - Progress bar kalan oranı gösterir
+        return Math.max((rem / targetVal * 100), 0);
+      
       default:
         return 0;
     }
@@ -79,10 +108,33 @@ function DashboardWidget({ widget, cards, columns, onEdit, onDelete, isDragging 
 
   const value = calculateValue();
   const progress = calculateProgress();
-  const colorClass = `widget-${widget.settings?.color || 'blue'}`;
+  const color = widget.settings?.color || 'blue';
+  const colorClass = `widget-${color}`;
+  
+  // Custom renk için dinamik stiller oluştur
+  const customColor = widget.settings?.customColor;
+  const customStyle = color === 'custom' && customColor ? {
+    background: `linear-gradient(135deg, ${customColor}1F, ${customColor}14)`,
+    borderColor: `${customColor}4D`,
+  } : {};
+  
+  const customIconStyle = color === 'custom' && customColor ? {
+    background: `${customColor}33`,
+  } : {};
+  
+  const customProgressStyle = color === 'custom' && customColor ? {
+    background: `linear-gradient(90deg, ${customColor}, ${customColor}dd)`,
+  } : {};
+  
+  const customValueStyle = color === 'custom' && customColor ? {
+    color: customColor,
+  } : {};
 
   return (
-    <div className={`widget widget-gradient ${colorClass} ${isDragging ? 'dragging' : ''}`}>
+    <div 
+      className={`widget widget-gradient ${colorClass} ${isDragging ? 'dragging' : ''}`}
+      style={customStyle}
+    >
       {/* Widget Menu */}
       <div className="widget-menu-wrapper">
         <button
@@ -125,11 +177,11 @@ function DashboardWidget({ widget, cards, columns, onEdit, onDelete, isDragging 
 
       {/* Widget Content */}
       <div className="gradient-header">
-        <div className="gradient-icon-box">
+        <div className="gradient-icon-box" style={customIconStyle}>
           <span>{widget.icon}</span>
         </div>
         <div className="gradient-info">
-          <div className="gradient-value">{value}</div>
+          <div className="gradient-value" style={customValueStyle}>{value}</div>
           <div className="gradient-label">{widget.title}</div>
         </div>
       </div>
@@ -137,7 +189,7 @@ function DashboardWidget({ widget, cards, columns, onEdit, onDelete, isDragging 
       <div className="gradient-progress">
         <div 
           className="progress-bar" 
-          style={{ width: `${progress}%` }}
+          style={{ width: `${progress}%`, ...customProgressStyle }}
         ></div>
       </div>
     </div>
