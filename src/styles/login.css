@@ -61,6 +61,13 @@
   margin: 0 0 8px 0;
 }
 
+.login-subtitle {
+  font-size: 13px;
+  color: #64748b;
+  margin: 0;
+  font-weight: 400;
+}
+
 .login-header p {
   font-size: 13px;
   color: #64748b;

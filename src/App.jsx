@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { getCurrentUser } from './lib/supabase';
+import { initDomainConfig } from './config/domainConfig';
 import Login from './components/Login';
 import SignUp from './components/SignUp';
 import Board from './components/Board';
@@ -17,8 +18,9 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [showSignUp, setShowSignUp] = useState(false);
 
-  // Sayfa yüklendiğinde mevcut kullanıcıyı kontrol et
+  // Sayfa yüklendiğinde domain config ve kullanıcıyı kontrol et
   useEffect(() => {
+    initDomainConfig(); // Domain-based branding
     checkUser();
   }, []);
 

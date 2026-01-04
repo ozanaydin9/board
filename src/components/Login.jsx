@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { signIn } from '../lib/supabase';
+import getDomainConfig from '../config/domainConfig';
 import '../styles/login.css';
 
 /**
@@ -11,6 +12,16 @@ function Login({ onLoginSuccess, onSwitchToSignUp }) {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [config, setConfig] = useState(null);
+
+  useEffect(() => {
+    // Domain config'i al
+    const domainConfig = getDomainConfig();
+    setConfig(domainConfig);
+    
+    // Page title'ı güncelle
+    document.title = domainConfig.title;
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -36,8 +47,28 @@ function Login({ onLoginSuccess, onSwitchToSignUp }) {
     <div className="login-container">
       <div className="login-box">
         <div className="login-header">
-          <div className="logo">🍒</div>
-          <h1>TaskCherry</h1>
+          <div 
+            className="logo"
+            style={config?.logoGradient ? {
+              background: config.logoGradient,
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+            } : {}}
+          >
+            {config?.logo || '🍒'}
+          </div>
+          <h1 
+            style={config?.titleGradient ? {
+              background: config.titleGradient,
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+            } : {}}
+          >
+            {config?.appName || 'TaskCherry'}
+          </h1>
+          <p className="login-subtitle">{config?.loginSubtitle || 'Görevlerinizi tatlı bir şekilde yönetin'}</p>
         </div>
 
         <form onSubmit={handleSubmit} className="login-form">
@@ -77,6 +108,19 @@ function Login({ onLoginSuccess, onSwitchToSignUp }) {
             type="submit" 
             className="login-button"
             disabled={loading}
+            style={config?.buttonGradient ? {
+              background: config.buttonGradient,
+            } : {}}
+            onMouseEnter={(e) => {
+              if (config?.buttonHoverGradient) {
+                e.currentTarget.style.background = config.buttonHoverGradient;
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (config?.buttonGradient) {
+                e.currentTarget.style.background = config.buttonGradient;
+              }
+            }}
           >
             {loading ? 'Giriş yapılıyor...' : 'Giriş Yap'}
           </button>
