@@ -44,6 +44,15 @@
   flex: 1;
 }
 
+.column-drag-handle {
+  cursor: grab;
+  user-select: none;
+}
+
+.column-drag-handle:active {
+  cursor: grabbing;
+}
+
 .column-header-right {
   display: flex;
   align-items: center;
@@ -82,7 +91,7 @@
   border: none;
   cursor: pointer;
   padding: 4px;
-  font-size: 11px;
+  font-size: 14px; /* Increased from 11px */
   border-radius: 4px;
   transition: all 0.2s ease;
   display: flex;
@@ -90,13 +99,28 @@
   justify-content: center;
   color: #64748b;
   line-height: 1;
-  width: 22px;
-  height: 22px;
+  width: 24px; /* Increased from 22px */
+  height: 24px; /* Increased from 22px */
 }
 
 .column-action-btn:hover {
   background: rgba(255, 255, 255, 0.1);
   color: #e2e8f0;
+}
+
+/* Search Button Styles */
+.column-search-btn {
+  font-size: 13px !important;
+}
+
+.column-search-btn.active {
+  background: rgba(59, 130, 246, 0.2);
+  color: #60a5fa;
+}
+
+.column-search-btn.active:hover {
+  background: rgba(59, 130, 246, 0.3);
+  color: #93c5fd;
 }
 
 .column-delete-btn:hover {
@@ -119,6 +143,102 @@
 .pin-icon {
   margin-right: 4px;
   font-size: 12px;
+}
+
+/* Arama input */
+.column-search {
+  padding: 0 10px 8px 10px;
+  background: rgba(0, 0, 0, 0.2);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  animation: slideDown 0.2s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+    max-height: 0;
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    max-height: 50px;
+  }
+}
+
+.column-search-input {
+  width: 100%;
+  padding: 6px 8px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
+  color: #e2e8f0;
+  font-size: 11px;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.column-search-input::placeholder {
+  color: #64748b;
+}
+
+.column-search-input:focus {
+  border-color: #3b82f6;
+  background: rgba(0, 0, 0, 0.3);
+}
+
+/* Sıralama menüsü */
+.sort-menu-wrapper {
+  position: relative;
+}
+
+.sort-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 6px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  min-width: 140px;
+  z-index: 999;
+  overflow: hidden;
+  animation: slideDown 0.2s ease;
+}
+
+.sort-item {
+  width: 100%;
+  padding: 8px 12px;
+  background: transparent;
+  border: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+  color: #e2e8f0;
+  font-size: 11px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.sort-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.sort-item.active {
+  background: rgba(59, 130, 246, 0.15);
+  color: #60a5fa;
+}
+
+.sort-menu-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 998;
 }
 
 .column-title-edit {
@@ -332,6 +452,25 @@
 .add-card-cancel:hover {
   background: rgba(255, 255, 255, 0.1);
   color: #e2e8f0;
+}
+
+/* Yeni kart öncelik seçici */
+.add-card-priority {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.add-card-priority-label {
+  font-size: 10px;
+  color: #94a3b8;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 /* Responsive */

@@ -1,0 +1,243 @@
+/* ==========================================
+   BOARD TABS - Dark Theme Excel Sheet Benzeri
+   ========================================== */
+
+.board-tabs-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 48px;
+  background: #1e293b;
+  border-top: 1px solid #334155;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.3);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+}
+
+.board-tabs-scroll {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  flex: 1;
+  padding: 6px 0;
+}
+
+.board-tabs-scroll::-webkit-scrollbar {
+  height: 6px;
+}
+
+.board-tabs-scroll::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+}
+
+.board-tabs-scroll::-webkit-scrollbar-thumb {
+  background: #475569;
+  border-radius: 3px;
+}
+
+.board-tabs-scroll::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}
+
+/* ==========================================
+   BOARD TAB
+   ========================================== */
+
+.board-tab {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 36px;
+  min-width: 100px;
+  max-width: 200px;
+  padding: 0 8px 0 16px; /* Sağdan daha az padding - ikonlar için yer */
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid #475569;
+  border-radius: 8px 8px 0 0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+  white-space: nowrap;
+  font-size: 14px;
+  color: #94a3b8;
+  font-weight: 500;
+  box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.board-tab:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: #64748b;
+  color: #e2e8f0;
+  z-index: 1;
+}
+
+.board-tab.active {
+  background: #0f172a;
+  border-color: #3b82f6;
+  border-width: 2px 2px 0 2px;
+  font-weight: 600;
+  color: #60a5fa;
+  z-index: 2;
+  box-shadow: 0 -2px 8px rgba(59, 130, 246, 0.2);
+  padding-bottom: 2px;
+}
+
+.board-tab-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+  margin-right: 12px; /* İsimle ikonlar arası boşluk */
+  min-width: 0; /* Flex shrink için gerekli */
+}
+
+/* Board Tab Actions (hover to show) */
+.board-tab-actions {
+  display: none;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0; /* İkonlar küçülmesin */
+  margin-left: auto; /* Tam sağa iter */
+}
+
+.board-tab:hover .board-tab-actions {
+  display: flex;
+}
+
+.board-tab-action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px; /* Daha küçük */
+  height: 20px; /* Daha küçük */
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  color: #94a3b8;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-size: 11px; /* Daha küçük icon */
+  flex-shrink: 0;
+}
+
+.board-tab-action-btn:hover {
+  background: rgba(59, 130, 246, 0.2);
+  border-color: #3b82f6;
+  color: #60a5fa;
+  transform: scale(1.15);
+}
+
+.board-tab-action-btn.delete-btn:hover {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: #ef4444;
+  color: #f87171;
+}
+
+.board-tab-input {
+  width: 100%;
+  height: 28px;
+  padding: 0 8px;
+  border: 1px solid #3b82f6;
+  border-radius: 4px;
+  outline: none;
+  font-size: 14px;
+  font-family: inherit;
+  background: #0f172a;
+  color: #e2e8f0;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* ==========================================
+   ADD BOARD BUTTON
+   ========================================== */
+
+.board-tab-add {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid #475569;
+  border-radius: 8px 8px 0 0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #94a3b8;
+  font-size: 20px;
+  line-height: 1;
+}
+
+.board-tab-add:hover {
+  background: rgba(59, 130, 246, 0.2);
+  border-color: #3b82f6;
+  color: #60a5fa;
+  transform: translateY(-2px);
+}
+
+.board-tab-add .add-icon {
+  display: block;
+  line-height: 1;
+}
+
+.board-tab.creating {
+  min-width: 140px;
+  padding: 0 12px;
+  background: #0f172a;
+}
+
+/* ==========================================
+   CONTEXT MENU - Artık Kullanılmıyor
+   ========================================== */
+
+/* Context menu yerine hover actions kullanılıyor */
+
+/* ==========================================
+   RESPONSIVE
+   ========================================== */
+
+@media (max-width: 768px) {
+  .board-tabs-container {
+    height: 52px;
+    padding: 0 12px;
+  }
+
+  .board-tab {
+    height: 40px;
+    min-width: 100px;
+    padding: 0 14px;
+    font-size: 14px;
+  }
+
+  .board-tab-add {
+    width: 40px;
+    height: 40px;
+    font-size: 22px;
+  }
+}
+
+/* ==========================================
+   ANIMATIONS
+   ========================================== */
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.board-tabs-container {
+  animation: slideInUp 0.2s ease-out;
+}
+

@@ -1,8 +1,11 @@
 import { useState, useEffect } from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { getCurrentUser } from './lib/supabase';
 import Login from './components/Login';
 import SignUp from './components/SignUp';
 import Board from './components/Board';
+import ReportsPage from './pages/ReportsPage';
+import ReportDetailPage from './pages/ReportDetailPage';
 import './App.css';
 
 /**
@@ -48,7 +51,13 @@ function App() {
   return (
     <div className="app">
       {user ? (
-        <Board user={user} onLogout={handleLogout} />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Board user={user} onLogout={handleLogout} />} />
+            <Route path="/reports" element={<ReportsPage />} />
+            <Route path="/reports/:id" element={<ReportDetailPage />} />
+          </Routes>
+        </BrowserRouter>
       ) : showSignUp ? (
         <SignUp 
           onSignUpSuccess={handleSignUpSuccess}

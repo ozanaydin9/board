@@ -5,6 +5,7 @@
   height: 100vh;
   background: #0f172a;
   padding: 16px;
+  padding-bottom: 64px; /* Board tabs için boşluk (48px + 16px) */
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -390,83 +391,52 @@
   filter: brightness(1.1);
 }
 
-/* Widget menü */
-.widget-menu-wrapper {
+/* Widget actions (kart gibi hover'da görünür) */
+.widget-actions {
   position: absolute;
   top: 8px;
   right: 8px;
+  display: flex;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
   z-index: 10;
 }
 
-.widget-menu-btn {
-  background: rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 4px;
-  color: #94a3b8;
-  cursor: pointer;
-  padding: 4px 8px;
-  font-size: 16px;
-  line-height: 1;
-  transition: all 0.2s ease;
-  opacity: 0;
-}
-
-.widget:hover .widget-menu-btn {
+.widget:hover .widget-actions {
   opacity: 1;
 }
 
-.widget-menu-btn:hover {
-  background: rgba(0, 0, 0, 0.5);
-  color: #e2e8f0;
-}
-
-.widget-menu-dropdown {
-  position: absolute;
-  top: calc(100% + 4px);
-  right: 0;
+.widget-action-btn {
   background: #1e293b;
-  border: 1px solid #334155;
-  border-radius: 6px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
-  min-width: 140px;
-  z-index: 999;
-  overflow: hidden;
-}
-
-.widget-menu-item {
-  width: 100%;
-  padding: 10px 12px;
-  background: transparent;
-  border: none;
+  border: 1px solid #475569;
+  border-radius: 4px;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 4px;
+  font-size: 12px;
+  line-height: 1;
+  width: 22px;
+  height: 22px;
   display: flex;
   align-items: center;
-  gap: 8px;
-  cursor: pointer;
+  justify-content: center;
   transition: all 0.2s ease;
-  text-align: left;
-  color: #e2e8f0;
-  font-size: 13px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-.widget-menu-item:hover {
-  background: rgba(255, 255, 255, 0.05);
+.widget-action-btn:hover {
+  background: #3b82f6;
+  border-color: #3b82f6;
+  color: white;
+  transform: scale(1.1);
 }
 
-.widget-menu-item.delete-item {
-  color: #f87171;
-}
-
-.widget-menu-item.delete-item:hover {
-  background: rgba(220, 38, 38, 0.1);
-}
-
-.widget-menu-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 998;
+.widget-delete-btn:hover {
+  background: #dc2626;
+  border-color: #dc2626;
+  color: white;
+  transform: scale(1.1);
 }
 
 /* Widget Ekle Butonu */
@@ -580,6 +550,37 @@
   align-items: center;
   padding-right: 16px;
   border-right: 1px solid #334155;
+}
+
+.reports-button,
+.create-report-button {
+  padding: 10px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  text-decoration: none;
+  color: #94a3b8;
+}
+
+.reports-button:hover {
+  background: rgba(59, 130, 246, 0.1);
+  border-color: #3b82f6;
+  color: #60a5fa;
+}
+
+.create-report-button:hover {
+  background: rgba(34, 197, 94, 0.1);
+  border-color: #22c55e;
+  color: #4ade80;
 }
 
 .add-column-button {
@@ -744,10 +745,22 @@
   cursor: pointer;
   transition: all 0.2s ease;
   text-align: left;
+  color: #e2e8f0;
+  text-decoration: none;
 }
 
 .user-menu-item:hover {
   background: rgba(255, 255, 255, 0.05);
+}
+
+.reports-menu-item {
+  color: #94a3b8;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.reports-menu-item:hover {
+  background: rgba(59, 130, 246, 0.1);
+  color: #60a5fa;
 }
 
 .logout-item {

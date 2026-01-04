@@ -18,7 +18,14 @@ import SelectColumnModal from './SelectColumnModal';
 import SettingsModal from './SettingsModal';
 import WidgetModal from './WidgetModal';
 import DashboardWidget from './DashboardWidget';
+import ConfirmModal from './ConfirmModal';
+import BoardTabs from './BoardTabs';
+import Toast from './Toast';
 import {
+  getBoards,
+  createBoard,
+  updateBoard,
+  deleteBoard,
   getColumns,
   getCards,
   createColumn,
@@ -42,6 +49,8 @@ import '../styles/board.css';
  * Ana board ekranı - drag & drop ve tüm CRUD operasyonlarını yönetir
  */
 function Board({ user, onLogout }) {
+  const [boards, setBoards] = useState([]);
+  const [activeBoard, setActiveBoard] = useState(null);
   const [columns, setColumns] = useState([]);
   const [cards, setCards] = useState([]);
   const [activeCard, setActiveCard] = useState(null);
@@ -55,6 +64,8 @@ function Board({ user, onLogout }) {
   const [widgets, setWidgets] = useState([]);
   const [showWidgetModal, setShowWidgetModal] = useState(false);
   const [editingWidget, setEditingWidget] = useState(null);
+  const [widgetToDelete, setWidgetToDelete] = useState(null);
+  const [toast, setToast] = useState(null);
 
   // Drag & drop sensorleri
   const sensors = useSensors(
@@ -70,17 +81,49 @@ function Board({ user, onLogout }) {
 
   // İlk yüklemede verileri çek
   useEffect(() => {
-    loadData();
+    loadBoards();
     loadUserSettings();
-    loadWidgets();
   }, []);
 
-  const loadData = async () => {
+  // Board değiştiğinde verileri yükle
+  useEffect(() => {
+    if (activeBoard) {
+      loadData();
+      loadWidgets();
+    }
+  }, [activeBoard]);
+
+  const loadBoards = async () => {
     setLoading(true);
     try {
+      const { data, error } = await getBoards();
+      
+      if (error) {
+        console.error('Boardlar yüklenemedi:', error);
+        setToast({ message: 'Board\'lar yüklenirken hata oluştu.', type: 'error' });
+      } else if (data && data.length > 0) {
+        setBoards(data);
+        setActiveBoard(data[0]); // İlk board'u aktif yap
+      } else {
+        // Hiç board yoksa varsayılan board oluştur
+        await handleCreateBoard('Ana Board');
+      }
+    } catch (error) {
+      console.error('Board yükleme hatası:', error);
+      setToast({ message: 'Board yükleme hatası oluştu.', type: 'error' });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
+  const loadData = async () => {
+    if (!activeBoard) return;
+    
+    try {
       const [columnsResult, cardsResult] = await Promise.all([
-        getColumns(),
-        getCards(),
+        getColumns(activeBoard.id),
+        getCards(activeBoard.id),
       ]);
 
       if (columnsResult.error) {
@@ -96,8 +139,6 @@ function Board({ user, onLogout }) {
       }
     } catch (error) {
       console.error('Veri yükleme hatası:', error);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -109,23 +150,89 @@ function Board({ user, onLogout }) {
   };
 
   const loadWidgets = async () => {
-    const { data, error } = await getUserWidgets();
+    if (!activeBoard) return;
+    
+    const { data, error } = await getUserWidgets(activeBoard.id);
     if (!error) {
       setWidgets(data);
     }
   };
 
+  // Board CRUD işlemleri
+  const handleCreateBoard = async (name) => {
+    const maxOrder = boards.length > 0 
+      ? Math.max(...boards.map(b => b.order || 0)) 
+      : 0;
+
+    const { data, error } = await createBoard(name, maxOrder + 1);
+    
+    if (error) {
+      console.error('Board oluşturulamadı:', error);
+      setToast({ message: 'Board oluşturulurken bir hata oluştu.', type: 'error' });
+    } else if (data) {
+      setBoards(prev => [...prev, data]);
+      setActiveBoard(data); // Yeni board'u aktif yap
+      setToast({ message: `"${name}" board'u oluşturuldu!`, type: 'success' });
+    }
+  };
+
+  const handleBoardChange = (board) => {
+    setActiveBoard(board);
+    // Demo modda sadece görsel değişim
+    if (board.id.startsWith('demo-')) {
+      console.log(`🎨 DEMO MOD: "${board.name}" board'una geçildi (görsel demo)`);
+    }
+  };
+
+  const handleBoardRename = async (boardId, newName) => {
+    const { data, error } = await updateBoard(boardId, { name: newName });
+    
+    if (error) {
+      console.error('Board güncellenemedi:', error);
+      setToast({ message: 'Board güncellenirken bir hata oluştu.', type: 'error' });
+    } else if (data) {
+      setBoards(prev => prev.map(b => b.id === boardId ? data : b));
+      if (activeBoard?.id === boardId) {
+        setActiveBoard(data);
+      }
+      setToast({ message: `Board adı "${newName}" olarak değiştirildi.`, type: 'success' });
+    }
+  };
+
+  const handleBoardDelete = async (boardId) => {
+    const { error } = await deleteBoard(boardId);
+    
+    if (error) {
+      console.error('Board silinemedi:', error);
+      setToast({ message: 'Board silinirken bir hata oluştu.', type: 'error' });
+    } else {
+      const newBoards = boards.filter(b => b.id !== boardId);
+      setBoards(newBoards);
+      
+      // Silinen board aktif board ise başka birine geç
+      if (activeBoard?.id === boardId && newBoards.length > 0) {
+        setActiveBoard(newBoards[0]);
+      }
+      setToast({ message: 'Board silindi.', type: 'success' });
+    }
+  };
+
   // Kolon ekleme
   const handleAddColumn = async () => {
+    if (!activeBoard) {
+      setToast({ message: 'Önce bir board seçmelisiniz.', type: 'error' });
+      return;
+    }
+
     const maxOrder = columns.length > 0 
       ? Math.max(...columns.map(c => c.order || 0)) 
       : 0;
 
-    const { data, error } = await createColumn('Yeni Kolon', maxOrder + 1);
+    const { data, error } = await createColumn('Yeni Kolon', maxOrder + 1, false, activeBoard.id);
 
     if (error) {
       console.error('Kolon oluşturulamadı:', error);
-      alert('Kolon oluşturulurken bir hata oluştu.');
+      setToast({ message: 'Kolon oluşturulurken bir hata oluştu.', type: 'error' });
     } else if (data) {
       setColumns(prevColumns => [...prevColumns, data]);
       setEditingColumnId(data.id);
@@ -158,17 +265,25 @@ function Board({ user, onLogout }) {
 
   // Kart ekleme
   const handleAddCard = async (cardData) => {
+    if (!activeBoard) {
+      setToast({ message: 'Önce bir board seçmelisiniz.', type: 'error' });
+      return;
+    }
+
     const { data, error } = await createCard(
       cardData.title,
       cardData.description,
       cardData.price,
       cardData.column_id,
-      cardData.order
+      cardData.order,
+      cardData.priority,
+      cardData.note,
+      activeBoard.id
     );
 
     if (error) {
       console.error('Kart oluşturulamadı:', error);
-      alert('Kart oluşturulurken bir hata oluştu.');
+      setToast({ message: 'Kart oluşturulurken bir hata oluştu.', type: 'error' });
     } else if (data) {
       setCards(prevCards => [...prevCards, data]);
     }
@@ -201,6 +316,12 @@ function Board({ user, onLogout }) {
   // Drag başlangıcı
   const handleDragStart = (event) => {
     const { active } = event;
+    
+    // Kolon başlığı mı sürükleniyor?
+    if (active.id.toString().startsWith('column-')) {
+      return; // Kolon drag'i için özel handler
+    }
+    
     const card = cards.find(c => c.id === active.id);
     setActiveCard(card);
   };
@@ -211,6 +332,29 @@ function Board({ user, onLogout }) {
     setActiveCard(null);
 
     if (!over) return;
+
+    // Kolon drag & drop
+    if (active.id.toString().startsWith('column-')) {
+      const activeColumnId = active.id.toString().replace('column-', '');
+      const overColumnId = over.id.toString().replace('column-', '');
+      
+      const oldIndex = columns.findIndex(c => c.id === activeColumnId);
+      const newIndex = columns.findIndex(c => c.id === overColumnId);
+      
+      if (oldIndex === -1 || newIndex === -1 || oldIndex === newIndex) return;
+      
+      const reorderedColumns = arrayMove(columns, oldIndex, newIndex);
+      
+      // UI güncelle
+      setColumns(reorderedColumns);
+      
+      // Veritabanını güncelle
+      for (let i = 0; i < reorderedColumns.length; i++) {
+        await updateColumn(reorderedColumns[i].id, { order: i + 1 });
+      }
+      
+      return;
+    }
 
     const activeCard = cards.find(c => c.id === active.id);
     if (!activeCard) return;
@@ -343,7 +487,7 @@ function Board({ user, onLogout }) {
       // Güncelleme
       const { data, error } = await updateWidget(editingWidget.id, widgetData);
       if (error) {
-        alert('Widget güncellenirken hata oluştu.');
+        setToast({ message: 'Widget güncellenirken hata oluştu.', type: 'error' });
       } else if (data) {
         setWidgets(prevWidgets => prevWidgets.map(w => w.id === editingWidget.id ? data : w));
         setShowWidgetModal(false);
@@ -351,17 +495,23 @@ function Board({ user, onLogout }) {
       }
     } else {
       // Yeni widget
+      if (!activeBoard) {
+        setToast({ message: 'Önce bir board seçmelisiniz.', type: 'error' });
+        return;
+      }
+
       const maxOrder = widgets.length > 0 
         ? Math.max(...widgets.map(w => w.order || 0)) 
         : 0;
       
       const { data, error } = await createWidget({
         ...widgetData,
+        board_id: activeBoard.id,
         order: maxOrder + 1
       });
       
       if (error) {
-        alert('Widget eklenirken hata oluştu.');
+        setToast({ message: 'Widget eklenirken hata oluştu.', type: 'error' });
       } else if (data) {
         setWidgets(prevWidgets => [...prevWidgets, data]);
         setShowWidgetModal(false);
@@ -370,14 +520,19 @@ function Board({ user, onLogout }) {
   };
 
   const handleDeleteWidget = async (widgetId) => {
-    if (!confirm('Bu widget\'ı silmek istediğinize emin misiniz?')) return;
+    setWidgetToDelete(widgetId);
+  };
+
+  const confirmDeleteWidget = async () => {
+    if (!widgetToDelete) return;
     
-    const { error } = await deleteWidget(widgetId);
+    const { error } = await deleteWidget(widgetToDelete);
     if (error) {
       alert('Widget silinirken hata oluştu.');
     } else {
-      setWidgets(prevWidgets => prevWidgets.filter(w => w.id !== widgetId));
+      setWidgets(prevWidgets => prevWidgets.filter(w => w.id !== widgetToDelete));
     }
+    setWidgetToDelete(null);
   };
 
   // Widget drag & drop
@@ -417,6 +572,14 @@ function Board({ user, onLogout }) {
       <div className="board-loading">
         <div className="loading-spinner"></div>
         <p>Yükleniyor...</p>
+      </div>
+    );
+  }
+
+  if (!activeBoard) {
+    return (
+      <div className="board-loading">
+        <p>Board bulunamadı. Lütfen yeni bir board oluşturun.</p>
       </div>
     );
   }
@@ -486,6 +649,15 @@ function Board({ user, onLogout }) {
 
   return (
     <div className="board-container">
+      {/* Toast Notification */}
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
+
       <header className="board-header">
         {/* Sol taraf: Dashboard widget'ları */}
         <div className="board-header-left">
@@ -553,6 +725,14 @@ function Board({ user, onLogout }) {
                     <span className="user-menu-email">{user?.email}</span>
                   </div>
                 </div>
+                <a
+                  href="/reports"
+                  className="user-menu-item reports-menu-item"
+                  onClick={() => setShowUserMenu(false)}
+                >
+                  <span className="menu-item-icon">📊</span>
+                  <span className="menu-item-text">Raporlar</span>
+                </a>
                 <button 
                   onClick={() => {
                     setShowUserMenu(false);
@@ -585,15 +765,19 @@ function Board({ user, onLogout }) {
       >
         <div className="board-content">
           {/* Sol taraf - Normal kolonlar (scrollable) */}
-          <div className="board-columns-scrollable">
-            {unpinnedColumns.map(renderColumn)}
-          </div>
+          <SortableContext items={unpinnedColumns.map(c => `column-${c.id}`)} strategy={horizontalListSortingStrategy}>
+            <div className="board-columns-scrollable">
+              {unpinnedColumns.map(renderColumn)}
+            </div>
+          </SortableContext>
 
           {/* Sağ taraf - Pinlenen kolonlar (fixed) */}
           {pinnedColumns.length > 0 && (
-            <div className="board-columns-pinned">
-              {pinnedColumns.map(renderColumn)}
-            </div>
+            <SortableContext items={pinnedColumns.map(c => `column-${c.id}`)} strategy={horizontalListSortingStrategy}>
+              <div className="board-columns-pinned">
+                {pinnedColumns.map(renderColumn)}
+              </div>
+            </SortableContext>
           )}
         </div>
 
@@ -607,6 +791,16 @@ function Board({ user, onLogout }) {
           ) : null}
         </DragOverlay>
       </DndContext>
+
+      {/* Board Tabs - En altta */}
+      <BoardTabs
+        boards={boards}
+        activeBoard={activeBoard}
+        onBoardChange={handleBoardChange}
+        onBoardCreate={handleCreateBoard}
+        onBoardRename={handleBoardRename}
+        onBoardDelete={handleBoardDelete}
+      />
 
       <SelectColumnModal
         isOpen={showColumnSelectModal}
@@ -635,6 +829,17 @@ function Board({ user, onLogout }) {
           setShowWidgetModal(false);
           setEditingWidget(null);
         }}
+      />
+
+      <ConfirmModal
+        isOpen={!!widgetToDelete}
+        title="Widget Sil"
+        message="Bu widget'ı silmek istediğinize emin misiniz?"
+        onConfirm={confirmDeleteWidget}
+        onCancel={() => setWidgetToDelete(null)}
+        confirmText="Sil"
+        cancelText="İptal"
+        isDanger={true}
       />
     </div>
   );

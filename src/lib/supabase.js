@@ -19,6 +19,80 @@ export const getCurrentUser = async () => {
   return user;
 };
 
+// ============================================
+// BOARDS API
+// ============================================
+
+/**
+ * Kullanıcının tüm boardlarını getir
+ */
+export const getBoards = async () => {
+  const { data, error } = await supabase
+    .from('boards')
+    .select('*')
+    .order('order', { ascending: true });
+  
+  return { data, error };
+};
+
+/**
+ * Tek bir board getir
+ */
+export const getBoard = async (boardId) => {
+  const { data, error } = await supabase
+    .from('boards')
+    .select('*')
+    .eq('id', boardId)
+    .single();
+  
+  return { data, error };
+};
+
+/**
+ * Yeni board oluştur
+ */
+export const createBoard = async (name, order) => {
+  const { data: { user } } = await supabase.auth.getUser();
+  
+  if (!user) {
+    return { data: null, error: new Error('User not authenticated') };
+  }
+
+  const { data, error } = await supabase
+    .from('boards')
+    .insert([{ name, order, user_id: user.id }])
+    .select()
+    .single();
+  
+  return { data, error };
+};
+
+/**
+ * Board güncelle
+ */
+export const updateBoard = async (boardId, updates) => {
+  const { data, error } = await supabase
+    .from('boards')
+    .update(updates)
+    .eq('id', boardId)
+    .select()
+    .single();
+  
+  return { data, error };
+};
+
+/**
+ * Board sil
+ */
+export const deleteBoard = async (boardId) => {
+  const { error } = await supabase
+    .from('boards')
+    .delete()
+    .eq('id', boardId);
+  
+  return { error };
+};
+
 /**
  * Kullanıcı kaydı
  */
@@ -52,11 +126,16 @@ export const signOut = async () => {
 /**
  * Kolonları getir
  */
-export const getColumns = async () => {
-  const { data, error } = await supabase
+export const getColumns = async (boardId) => {
+  let query = supabase
     .from('columns')
-    .select('*')
-    .order('order', { ascending: true });
+    .select('*');
+  
+  if (boardId) {
+    query = query.eq('board_id', boardId);
+  }
+  
+  const { data, error } = await query.order('order', { ascending: true });
   
   return { data, error };
 };
@@ -64,12 +143,12 @@ export const getColumns = async () => {
 /**
  * Yeni kolon oluştur
  */
-export const createColumn = async (title, order, pinned = false) => {
+export const createColumn = async (title, order, pinned = false, boardId) => {
   const { data: { user } } = await supabase.auth.getUser();
   
   const { data, error } = await supabase
     .from('columns')
-    .insert([{ title, order, pinned, user_id: user?.id }])
+    .insert([{ title, order, pinned, board_id: boardId, user_id: user?.id }])
     .select()
     .single();
   
@@ -105,11 +184,16 @@ export const deleteColumn = async (id) => {
 /**
  * Kartları getir
  */
-export const getCards = async () => {
-  const { data, error } = await supabase
+export const getCards = async (boardId) => {
+  let query = supabase
     .from('cards')
-    .select('*')
-    .order('order', { ascending: true });
+    .select('*');
+  
+  if (boardId) {
+    query = query.eq('board_id', boardId);
+  }
+  
+  const { data, error } = await query.order('order', { ascending: true });
   
   return { data, error };
 };
@@ -117,12 +201,12 @@ export const getCards = async () => {
 /**
  * Yeni kart oluştur
  */
-export const createCard = async (title, description, price, column_id, order) => {
+export const createCard = async (title, description, price, column_id, order, priority = null, note = null, boardId = null) => {
   const { data: { user } } = await supabase.auth.getUser();
   
   const { data, error } = await supabase
     .from('cards')
-    .insert([{ title, description, price, column_id, order, user_id: user?.id }])
+    .insert([{ title, description, price, column_id, order, priority, note, board_id: boardId, user_id: user?.id }])
     .select()
     .single();
   
@@ -204,18 +288,23 @@ export const updateUserSettings = async (settings) => {
 /**
  * Kullanıcı widget'larını getir
  */
-export const getUserWidgets = async () => {
+export const getUserWidgets = async (boardId) => {
   const { data: { user } } = await supabase.auth.getUser();
   
   if (!user) {
     return { data: [], error: new Error('User not authenticated') };
   }
 
-  const { data, error } = await supabase
+  let query = supabase
     .from('user_widgets')
     .select('*')
-    .eq('user_id', user.id)
-    .order('order', { ascending: true });
+    .eq('user_id', user.id);
+  
+  if (boardId) {
+    query = query.eq('board_id', boardId);
+  }
+
+  const { data, error } = await query.order('order', { ascending: true });
   
   return { data: data || [], error };
 };
@@ -281,4 +370,86 @@ export const createDefaultWidgets = async () => {
   
   return { error };
 };
+
+// ============================================
+// REPORTS (SNAPSHOTS) API
+// ============================================
+
+/**
+ * Tüm raporları getir
+ */
+export const getReports = async (boardId = null) => {
+  let query = supabase
+    .from('reports')
+    .select('*');
+  
+  if (boardId) {
+    query = query.eq('board_id', boardId);
+  }
+  
+  const { data, error } = await query.order('created_at', { ascending: false });
+  
+  return { data, error };
+};
+
+/**
+ * Rapor oluştur (snapshot)
+ */
+export const createReport = async (title, description, snapshotData, boardId = null) => {
+  const { data: { user } } = await supabase.auth.getUser();
+  
+  const { data, error } = await supabase
+    .from('reports')
+    .insert([{ 
+      title, 
+      description, 
+      snapshot_data: snapshotData,
+      board_id: boardId,
+      user_id: user?.id 
+    }])
+    .select()
+    .single();
+  
+  return { data, error };
+};
+
+/**
+ * Rapor güncelle
+ */
+export const updateReport = async (id, updates) => {
+  const { data, error } = await supabase
+    .from('reports')
+    .update(updates)
+    .eq('id', id)
+    .select()
+    .single();
+  
+  return { data, error };
+};
+
+/**
+ * Rapor sil
+ */
+export const deleteReport = async (id) => {
+  const { error } = await supabase
+    .from('reports')
+    .delete()
+    .eq('id', id);
+  
+  return { error };
+};
+
+/**
+ * Tek bir raporu getir
+ */
+export const getReport = async (id) => {
+  const { data, error } = await supabase
+    .from('reports')
+    .select('*')
+    .eq('id', id)
+    .single();
+  
+  return { data, error };
+};
+
 

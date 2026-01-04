@@ -5,9 +5,12 @@ Görevlerinizi tatlı bir şekilde yönetin! Modern, akıcı ve özelleştirileb
 ## ✨ Özellikler
 
 - ✅ **Drag & Drop**: Kartları kolonlar arasında sürükle-bırak ile taşıyın
+- ✅ **Çoklu Board**: Her kullanıcı birden fazla board oluşturabilir ve yönetebilir
+- ✅ **Board Navigasyonu**: Excel sheet gibi alt tab'larla boardlar arası geçiş
 - ✅ **Kolon Yönetimi**: Kendi kolonlarınızı (statülerinizi) oluşturun ve yönetin
 - ✅ **Kart CRUD**: Kartları oluşturun, düzenleyin, silin
 - ✅ **Fiyat Takibi**: Her karta fiyat ekleyin ve kolon başlıklarında otomatik toplam görün
+- ✅ **Raporlama**: Board snapshot'ları oluşturun ve board bazlı filtreleyin
 - ✅ **Authentication**: Supabase ile güvenli giriş sistemi
 - ✅ **Modern UI**: Custom CSS ile tasarlanmış, temiz ve profesyonel arayüz
 - ✅ **Responsive**: Masaüstü ve mobil uyumlu
@@ -34,46 +37,13 @@ npm install
 
 1. [Supabase](https://supabase.com) hesabı oluşturun
 2. Yeni bir proje oluşturun
-3. SQL Editor'de aşağıdaki tabloları oluşturun:
+3. SQL Editor'de `supabase-setup.sql` dosyasını çalıştırın
+4. Ardından `add-boards-system.sql` dosyasını çalıştırarak çoklu board desteğini ekleyin
 
-#### Columns Tablosu
-
-```sql
-create table public.columns (
-  id uuid default gen_random_uuid() primary key,
-  title text not null,
-  "order" integer not null default 0,
-  created_at timestamp with time zone default timezone('utc'::text, now()) not null
-);
-
--- RLS politikalarını etkinleştirin
-alter table public.columns enable row level security;
-
--- Herkese okuma ve yazma izni verin (demo için)
-create policy "Enable all access for all users" on public.columns
-  for all using (true);
-```
-
-#### Cards Tablosu
-
-```sql
-create table public.cards (
-  id uuid default gen_random_uuid() primary key,
-  title text not null,
-  description text,
-  price numeric default 0,
-  column_id uuid references public.columns(id) on delete cascade,
-  "order" integer not null default 0,
-  created_at timestamp with time zone default timezone('utc'::text, now()) not null
-);
-
--- RLS politikalarını etkinleştirin
-alter table public.cards enable row level security;
-
--- Herkese okuma ve yazma izni verin (demo için)
-create policy "Enable all access for all users" on public.cards
-  for all using (true);
-```
+**Önemli:** Tüm SQL migration dosyalarını sırasıyla çalıştırmanız gerekmektedir:
+- `supabase-setup.sql` (Temel tablolar)
+- `add-card-note.sql`, `add-column-features.sql`, vb. (Ek özellikler)
+- `add-boards-system.sql` (Çoklu board sistemi)
 
 ### 3. Environment Variables Ayarlayın
 
@@ -109,11 +79,20 @@ Uygulama `http://localhost:5173` adresinde çalışacaktır.
 ## 📖 Kullanım
 
 1. **Giriş Yapın**: Oluşturduğunuz kullanıcı bilgileri ile giriş yapın
-2. **Kolon Ekleyin**: "Yeni Kolon" butonuna tıklayarak kolonlar oluşturun (örn: "Yapılacak", "Devam Eden", "Tamamlanan")
-3. **Kart Ekleyin**: Her kolonun altındaki "Kart Ekle" butonuna tıklayarak kart oluşturun
-4. **Kart Bilgileri**: Her karta başlık, açıklama ve fiyat ekleyebilirsiniz
-5. **Drag & Drop**: Kartları sürükleyerek kolonlar arasında taşıyın
-6. **Düzenle & Sil**: Kartların ve kolonların üzerine geldiğinizde düzenleme ve silme butonları görünür
+2. **Board Yönetimi**: 
+   - Ekranın alt kısmındaki tab'lardan mevcut boardlar arasında geçiş yapın
+   - "+" butonuna tıklayarak yeni board oluşturun
+   - Bir board'a sağ tıklayarak yeniden adlandırın veya silin
+3. **Kolon Ekleyin**: "Yeni Kolon" butonuna tıklayarak kolonlar oluşturun (örn: "Yapılacak", "Devam Eden", "Tamamlanan")
+4. **Kart Ekleyin**: Her kolonun altındaki "Kart Ekle" butonuna tıklayarak kart oluşturun
+5. **Kart Bilgileri**: Her karta başlık, açıklama ve fiyat ekleyebilirsiniz
+6. **Drag & Drop**: Kartları sürükleyerek kolonlar arasında taşıyın
+7. **Raporlama**: 
+   - Kullanıcı menüsünden "Raporlar" sayfasına gidin
+   - Yeni rapor oluştur butonuna tıklayın
+   - Board seçin ve rapor başlığı girin
+   - Raporları board'a göre filtreleyin
+8. **Düzenle & Sil**: Kartların ve kolonların üzerine geldiğinizde düzenleme ve silme butonları görünür
 
 ## 🎨 Proje Yapısı
 
@@ -121,15 +100,21 @@ Uygulama `http://localhost:5173` adresinde çalışacaktır.
 src/
 ├── components/
 │   ├── Board.jsx          # Ana board ekranı
+│   ├── BoardTabs.jsx      # Board navigasyon tab'ları
 │   ├── Column.jsx         # Kolon bileşeni
 │   ├── Card.jsx          # Kart bileşeni
+│   ├── CreateReportModal.jsx  # Rapor oluşturma modalı
 │   └── Login.jsx         # Login ekranı
+├── pages/
+│   └── ReportsPage.jsx   # Raporlar sayfası
 ├── lib/
 │   └── supabase.js       # Supabase client ve API fonksiyonları
 ├── styles/
 │   ├── board.css         # Board stilleri
+│   ├── board-tabs.css    # Board tab stilleri
 │   ├── column.css        # Kolon stilleri
 │   ├── card.css          # Kart stilleri
+│   ├── reports-page.css  # Raporlar sayfası stilleri
 │   └── login.css         # Login stilleri
 ├── App.jsx               # Ana uygulama bileşeni
 ├── App.css              # Global app stilleri
@@ -138,6 +123,14 @@ src/
 ```
 
 ## 🔑 Önemli Özellikler
+
+### Çoklu Board Sistemi
+
+- Her kullanıcı birden fazla board oluşturabilir
+- Board'lar arasında Excel sheet gibi alt tab'lardan geçiş
+- Sağ tıklama menüsü ile board yönetimi (yeniden adlandır, sil)
+- Her board'un kendi kolonları, kartları ve widget'ları
+- Board bazlı raporlama ve filtreleme
 
 ### Drag & Drop
 
@@ -203,6 +196,9 @@ Pull request'ler memnuniyetle karşılanır. Büyük değişiklikler için lütf
 - Kartları düzenlemek için üzerine gelip edit ikonuna tıklayın
 - Kolonları silmek için önce içindeki kartları silmelisiniz
 - Drag & drop sırasında kartın görsel bir kopyası mouse ile birlikte hareket eder
+- Board'lara sağ tıklayarak hızlıca yeniden adlandırabilir veya silebilirsiniz
+- Alt kısımdaki tab'lardan board'lar arasında hızlıca geçiş yapabilirsiniz
+- Raporları board bazlı filtreleyerek daha organize takip edebilirsiniz
 
 ## 📞 Destek
 

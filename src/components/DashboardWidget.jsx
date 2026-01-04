@@ -5,7 +5,6 @@ import { useState } from 'react';
  * Dinamik widget renderer
  */
 function DashboardWidget({ widget, cards, columns, onEdit, onDelete, isDragging }) {
-  const [showMenu, setShowMenu] = useState(false);
 
   // Widget değerini hesapla
   const calculateValue = () => {
@@ -14,7 +13,11 @@ function DashboardWidget({ widget, cards, columns, onEdit, onDelete, isDragging 
         return cards.length;
       
       case 'total_price':
-        const total = cards.reduce((sum, card) => sum + (parseFloat(card.price) || 0), 0);
+        const excludedColumnIds = widget.settings?.excludedColumns || [];
+        const filteredCards = excludedColumnIds.length > 0 
+          ? cards.filter(card => !excludedColumnIds.includes(card.column_id))
+          : cards;
+        const total = filteredCards.reduce((sum, card) => sum + (parseFloat(card.price) || 0), 0);
         return `₺${total.toLocaleString('tr-TR')}`;
       
       case 'high_priority':
@@ -179,63 +182,47 @@ function DashboardWidget({ widget, cards, columns, onEdit, onDelete, isDragging 
       className={`widget widget-gradient ${colorClass} ${isDragging ? 'dragging' : ''}`}
       style={customStyle}
     >
-      {/* Widget Menu */}
-      <div className="widget-menu-wrapper">
+      {/* Widget Actions (hover'da görünür) */}
+      <div className="widget-actions">
         <button
-          className="widget-menu-btn"
-          onClick={() => setShowMenu(!showMenu)}
-          title="Widget Ayarları"
+          onClick={(e) => {
+            e.stopPropagation();
+            onEdit(widget);
+          }}
+          className="widget-action-btn"
+          title="Düzenle"
         >
-          ⋮
+          ✎
         </button>
-        
-        {showMenu && (
-          <>
-            <div className="widget-menu-dropdown">
-              <button
-                onClick={() => {
-                  setShowMenu(false);
-                  onEdit(widget);
-                }}
-                className="widget-menu-item"
-              >
-                <span>✏️</span> Düzenle
-              </button>
-              <button
-                onClick={() => {
-                  setShowMenu(false);
-                  onDelete(widget.id);
-                }}
-                className="widget-menu-item delete-item"
-              >
-                <span>🗑️</span> Sil
-              </button>
-            </div>
-            <div 
-              className="widget-menu-overlay" 
-              onClick={() => setShowMenu(false)}
-            />
-          </>
-        )}
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onDelete(widget.id);
+          }}
+          className="widget-action-btn widget-delete-btn"
+          title="Sil"
+        >
+          ✕
+        </button>
       </div>
 
-      {/* Widget Content */}
-      <div className="gradient-header">
-        <div className="gradient-icon-box" style={customIconStyle}>
-          <span>{widget.icon}</span>
+        {/* Widget Content */}
+        <div className="gradient-header">
+          <div className="gradient-icon-box" style={customIconStyle}>
+            <span>{widget.icon}</span>
+          </div>
+          <div className="gradient-info">
+            <div className="gradient-value" style={customValueStyle}>{value}</div>
+            <div className="gradient-label">{widget.title}</div>
+          </div>
         </div>
-        <div className="gradient-info">
-          <div className="gradient-value" style={customValueStyle}>{value}</div>
-          <div className="gradient-label">{widget.title}</div>
+        
+        <div className="gradient-progress">
+          <div 
+            className="progress-bar" 
+            style={{ width: `${progress}%`, ...customProgressStyle }}
+          ></div>
         </div>
-      </div>
-      
-      <div className="gradient-progress">
-        <div 
-          className="progress-bar" 
-          style={{ width: `${progress}%`, ...customProgressStyle }}
-        ></div>
-      </div>
     </div>
   );
 }

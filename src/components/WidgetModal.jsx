@@ -46,6 +46,7 @@ function WidgetModal({ isOpen, widget = null, columns = [], onSave, onCancel }) 
   const [customText, setCustomText] = useState('');
   const [targetValue, setTargetValue] = useState('');
   const [percentageMode, setPercentageMode] = useState('completed'); // 'completed' veya 'remaining'
+  const [excludedColumns, setExcludedColumns] = useState([]); // Hariç tutulan kolonlar
   const [saving, setSaving] = useState(false);
   const [showIconPicker, setShowIconPicker] = useState(false);
 
@@ -62,6 +63,7 @@ function WidgetModal({ isOpen, widget = null, columns = [], onSave, onCancel }) 
         setCustomText(widget.settings?.customText || '');
         setTargetValue(widget.settings?.targetValue || '');
         setPercentageMode(widget.settings?.percentageMode || 'completed');
+        setExcludedColumns(widget.settings?.excludedColumns || []);
       } else {
         // Yeni widget - varsayılan değerlerle başla
         const defaultType = WIDGET_TYPES[0];
@@ -74,6 +76,7 @@ function WidgetModal({ isOpen, widget = null, columns = [], onSave, onCancel }) 
         setCustomText('');
         setTargetValue('');
         setPercentageMode('completed');
+        setExcludedColumns([]);
       }
     }
   }, [isOpen, widget]);
@@ -99,6 +102,7 @@ function WidgetModal({ isOpen, widget = null, columns = [], onSave, onCancel }) 
       setColumnId('');
       setCustomText('');
       setTargetValue('');
+      setExcludedColumns([]);
     }
   };
 
@@ -139,7 +143,8 @@ function WidgetModal({ isOpen, widget = null, columns = [], onSave, onCancel }) 
         ...(columnId && { column_id: columnId }),
         ...(customText && { customText }),
         ...(parsedTargetValue > 0 && { targetValue: parsedTargetValue }),
-        ...(widgetType === 'target_percentage' && { percentageMode })
+        ...(widgetType === 'target_percentage' && { percentageMode }),
+        ...(excludedColumns.length > 0 && { excludedColumns })
       }
     };
 
@@ -323,6 +328,37 @@ function WidgetModal({ isOpen, widget = null, columns = [], onSave, onCancel }) 
               </select>
               {selectedType?.needsTarget && (
                 <p className="form-hint">Bu kolonun toplam fiyatı hedef değerden çıkarılacak</p>
+              )}
+            </div>
+          )}
+
+          {/* Hariç Tutulan Kolonlar (sadece total_price için) */}
+          {widgetType === 'total_price' && (
+            <div className="form-group">
+              <label className="form-label">Hesaplamadan Hariç Tutulan Kolonlar</label>
+              <div className="excluded-columns-container">
+                {columns.map(col => (
+                  <label key={col.id} className="excluded-column-item">
+                    <input
+                      type="checkbox"
+                      checked={excludedColumns.includes(col.id)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setExcludedColumns([...excludedColumns, col.id]);
+                        } else {
+                          setExcludedColumns(excludedColumns.filter(id => id !== col.id));
+                        }
+                      }}
+                      className="excluded-column-checkbox"
+                    />
+                    <span className="excluded-column-title">{col.title}</span>
+                  </label>
+                ))}
+              </div>
+              {excludedColumns.length > 0 && (
+                <p className="form-hint">
+                  {excludedColumns.length} kolon toplam hesaplamasına dahil edilmeyecek
+                </p>
               )}
             </div>
           )}

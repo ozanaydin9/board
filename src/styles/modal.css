@@ -120,6 +120,17 @@
   margin: 0;
 }
 
+.modal-description {
+  font-size: 13px;
+  color: #94a3b8;
+  line-height: 1.6;
+  margin: 0 0 20px 0;
+  padding: 12px;
+  background: rgba(59, 130, 246, 0.05);
+  border-left: 3px solid #3b82f6;
+  border-radius: 4px;
+}
+
 .modal-footer {
   padding: 16px 20px;
   border-top: 1px solid #334155;
@@ -351,7 +362,7 @@
 
 .form-label {
   display: block;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
   color: #94a3b8;
   margin-bottom: 6px;
@@ -362,20 +373,47 @@
 .form-input,
 .form-select {
   width: 100%;
-  padding: 10px 12px;
-  background: rgba(0, 0, 0, 0.3);
-  border: 1px solid #475569;
+  padding: 8px 10px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 6px;
   color: #e2e8f0;
-  font-size: 14px;
+  font-size: 13px;
   outline: none;
   transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.form-input::placeholder,
+.form-select::placeholder,
+.form-textarea::placeholder {
+  color: #64748b;
 }
 
 .form-input:focus,
 .form-select:focus {
   border-color: #3b82f6;
-  background: rgba(0, 0, 0, 0.4);
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.form-textarea {
+  width: 100%;
+  padding: 8px 10px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  color: #e2e8f0;
+  font-size: 13px;
+  outline: none;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 60px;
+}
+
+.form-textarea:focus {
+  border-color: #3b82f6;
+  background: rgba(0, 0, 0, 0.3);
 }
 
 .form-select {
@@ -703,4 +741,57 @@
   background: rgba(59, 130, 246, 0.2);
   border-color: #3b82f6;
   box-shadow: 0 0 16px rgba(59, 130, 246, 0.4);
+}
+
+/* Excluded Columns Styles */
+.excluded-columns-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  border: 1px solid #334155;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.excluded-columns-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.excluded-columns-container::-webkit-scrollbar-thumb {
+  background: #475569;
+  border-radius: 3px;
+}
+
+.excluded-column-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.excluded-column-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+  transform: translateX(2px);
+}
+
+.excluded-column-checkbox {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: #3b82f6;
+}
+
+.excluded-column-title {
+  flex: 1;
+  color: #e2e8f0;
+  font-size: 14px;
+  font-weight: 500;
 }
