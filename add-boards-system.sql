@@ -62,6 +62,10 @@ DROP POLICY IF EXISTS "Enable read access for columns" ON public.columns;
 DROP POLICY IF EXISTS "Enable insert access for columns" ON public.columns;
 DROP POLICY IF EXISTS "Enable update access for columns" ON public.columns;
 DROP POLICY IF EXISTS "Enable delete access for columns" ON public.columns;
+DROP POLICY IF EXISTS "Users can view own board columns" ON public.columns;
+DROP POLICY IF EXISTS "Users can insert own board columns" ON public.columns;
+DROP POLICY IF EXISTS "Users can update own board columns" ON public.columns;
+DROP POLICY IF EXISTS "Users can delete own board columns" ON public.columns;
 
 CREATE POLICY "Users can view own board columns" ON public.columns
   FOR SELECT USING (
@@ -110,6 +114,10 @@ DROP POLICY IF EXISTS "Enable read access for cards" ON public.cards;
 DROP POLICY IF EXISTS "Enable insert access for cards" ON public.cards;
 DROP POLICY IF EXISTS "Enable update access for cards" ON public.cards;
 DROP POLICY IF EXISTS "Enable delete access for cards" ON public.cards;
+DROP POLICY IF EXISTS "Users can view own board cards" ON public.cards;
+DROP POLICY IF EXISTS "Users can insert own board cards" ON public.cards;
+DROP POLICY IF EXISTS "Users can update own board cards" ON public.cards;
+DROP POLICY IF EXISTS "Users can delete own board cards" ON public.cards;
 
 CREATE POLICY "Users can view own board cards" ON public.cards
   FOR SELECT USING (
@@ -158,6 +166,10 @@ DROP POLICY IF EXISTS "Enable read access for reports" ON public.reports;
 DROP POLICY IF EXISTS "Enable insert access for reports" ON public.reports;
 DROP POLICY IF EXISTS "Enable update access for reports" ON public.reports;
 DROP POLICY IF EXISTS "Enable delete access for reports" ON public.reports;
+DROP POLICY IF EXISTS "Users can view own reports" ON public.reports;
+DROP POLICY IF EXISTS "Users can insert own reports" ON public.reports;
+DROP POLICY IF EXISTS "Users can update own reports" ON public.reports;
+DROP POLICY IF EXISTS "Users can delete own reports" ON public.reports;
 
 CREATE POLICY "Users can view own reports" ON public.reports
   FOR SELECT USING (auth.uid() = user_id);
@@ -176,6 +188,10 @@ DROP POLICY IF EXISTS "Enable read access for user_widgets" ON public.user_widge
 DROP POLICY IF EXISTS "Enable insert access for user_widgets" ON public.user_widgets;
 DROP POLICY IF EXISTS "Enable update access for user_widgets" ON public.user_widgets;
 DROP POLICY IF EXISTS "Enable delete access for user_widgets" ON public.user_widgets;
+DROP POLICY IF EXISTS "Users can view own board widgets" ON public.user_widgets;
+DROP POLICY IF EXISTS "Users can insert own board widgets" ON public.user_widgets;
+DROP POLICY IF EXISTS "Users can update own board widgets" ON public.user_widgets;
+DROP POLICY IF EXISTS "Users can delete own board widgets" ON public.user_widgets;
 
 CREATE POLICY "Users can view own board widgets" ON public.user_widgets
   FOR SELECT USING (
