@@ -431,9 +431,12 @@ function Board({ user, onLogout }) {
       .filter(card => card.column_id === column.id)
       .sort((a, b) => (a.order || 0) - (b.order || 0));
 
+    // Key'e cards dependency ekle - cards değişince re-render garanti
+    const columnKey = `${column.id}-${columnCards.length}-${columnCards.reduce((sum, c) => sum + (c.price || 0), 0)}`;
+
     return (
       <Column
-        key={column.id}
+        key={columnKey}
         column={column}
         cards={columnCards}
         onAddCard={handleAddCard}
@@ -492,7 +495,7 @@ function Board({ user, onLogout }) {
             onDragEnd={handleWidgetDragEnd}
           >
             <SortableContext items={widgets.map(w => w.id)} strategy={horizontalListSortingStrategy}>
-              <div className="dashboard-widgets">
+              <div className={`dashboard-widgets dashboard-widgets-${userSettings.widget_display_mode || 'wrap'}`}>
                 {widgets.map(widget => (
                   <SortableWidget key={widget.id} widget={widget} />
                 ))}
@@ -618,6 +621,7 @@ function Board({ user, onLogout }) {
       <SettingsModal
         isOpen={showSettingsModal}
         currentStarCount={userSettings.star_count || 5}
+        currentWidgetDisplayMode={userSettings.widget_display_mode || 'wrap'}
         onSave={handleSaveSettings}
         onCancel={() => setShowSettingsModal(false)}
       />

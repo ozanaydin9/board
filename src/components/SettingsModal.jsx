@@ -5,15 +5,19 @@ import '../styles/modal.css';
  * SettingsModal Component
  * Kullanıcı ayarları modalı
  */
-function SettingsModal({ isOpen, currentStarCount, onSave, onCancel }) {
+function SettingsModal({ isOpen, currentStarCount, currentWidgetDisplayMode, onSave, onCancel }) {
   const [starCount, setStarCount] = useState(currentStarCount || 5);
+  const [widgetDisplayMode, setWidgetDisplayMode] = useState(currentWidgetDisplayMode || 'wrap');
   const [saving, setSaving] = useState(false);
 
   if (!isOpen) return null;
 
   const handleSave = async () => {
     setSaving(true);
-    await onSave({ star_count: starCount });
+    await onSave({ 
+      star_count: starCount,
+      widget_display_mode: widgetDisplayMode 
+    });
     setSaving(false);
   };
 
@@ -58,6 +62,34 @@ function SettingsModal({ isOpen, currentStarCount, onSave, onCancel }) {
                 </div>
                 <span className="option-label">5 Yıldız</span>
                 <span className="option-desc">Detaylı sistem</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Widget Görünüm Modu */}
+          <div className="settings-section">
+            <label className="settings-label">Widget Görünüm Modu</label>
+            <p className="settings-description">
+              Dashboard widget'larının nasıl görüntüleneceğini seçin
+            </p>
+            
+            <div className="star-count-options">
+              <button
+                className={`star-count-option ${widgetDisplayMode === 'wrap' ? 'active' : ''}`}
+                onClick={() => setWidgetDisplayMode('wrap')}
+              >
+                <div className="option-icon">📦</div>
+                <span className="option-label">Çok Satırlı</span>
+                <span className="option-desc">Aşağıya doğru genişler</span>
+              </button>
+              
+              <button
+                className={`star-count-option ${widgetDisplayMode === 'scroll' ? 'active' : ''}`}
+                onClick={() => setWidgetDisplayMode('scroll')}
+              >
+                <div className="option-icon">↔️</div>
+                <span className="option-label">Tek Satır</span>
+                <span className="option-desc">Yatay scroll</span>
               </button>
             </div>
           </div>

@@ -30,13 +30,49 @@
   flex: 1;
   display: flex;
   align-items: center;
+  min-width: 0;
+  overflow: hidden;
+  padding-right: 24px;
+  margin-right: 24px;
+  border-right: 2px solid #334155;
 }
 
 .dashboard-widgets {
   display: flex;
   gap: 16px;
   align-items: center;
+  width: 100%;
+}
+
+/* Çok satırlı mod (wrap) - Varsayılan */
+.dashboard-widgets-wrap {
   flex-wrap: wrap;
+}
+
+/* Tek satır mod (scroll) */
+.dashboard-widgets-scroll {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  padding-right: 16px;
+}
+
+.dashboard-widgets-scroll::-webkit-scrollbar {
+  height: 6px;
+}
+
+.dashboard-widgets-scroll::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+}
+
+.dashboard-widgets-scroll::-webkit-scrollbar-thumb {
+  background: #475569;
+  border-radius: 3px;
+}
+
+.dashboard-widgets-scroll::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
 }
 
 .widget-group {
@@ -534,6 +570,7 @@
   display: flex;
   gap: 16px;
   align-items: center;
+  flex-shrink: 0;
 }
 
 /* İşlem butonları */
@@ -983,6 +1020,12 @@
 
   .board-header-left {
     width: 100%;
+    border-right: none;
+    border-bottom: 2px solid #334155;
+    padding-right: 0;
+    margin-right: 0;
+    padding-bottom: 12px;
+    margin-bottom: 12px;
   }
 
   .board-header-right {

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import IconPicker from './IconPicker';
 import '../styles/modal.css';
 
 const WIDGET_TYPES = [
@@ -12,6 +13,7 @@ const WIDGET_TYPES = [
   { value: 'average_price', label: 'Ortalama Fiyat', icon: '📈', needsColumn: false, needsCustomText: false, needsTarget: false },
   { value: 'custom_text', label: 'Özel Metin/Sayı', icon: '✏️', needsColumn: false, needsCustomText: true, needsTarget: false },
   { value: 'target_remaining', label: 'Hedef - Kolon Farkı', icon: '🎯', needsColumn: true, needsCustomText: false, needsTarget: true },
+  { value: 'target_percentage', label: 'Hedef Yüzdesi', icon: '📊', needsColumn: true, needsCustomText: false, needsTarget: true },
 ];
 
 const COLOR_THEMES = [
@@ -43,26 +45,49 @@ function WidgetModal({ isOpen, widget = null, columns = [], onSave, onCancel }) 
   const [columnId, setColumnId] = useState('');
   const [customText, setCustomText] = useState('');
   const [targetValue, setTargetValue] = useState('');
+  const [percentageMode, setPercentageMode] = useState('completed'); // 'completed' veya 'remaining'
   const [saving, setSaving] = useState(false);
+  const [showIconPicker, setShowIconPicker] = useState(false);
 
   useEffect(() => {
-    if (widget) {
-      // Düzenleme modu
-      setWidgetType(widget.widget_type);
-      setTitle(widget.title);
-      setIcon(widget.icon);
-      setColor(widget.settings?.color || 'blue');
-      setCustomColor(widget.settings?.customColor || '#3b82f6');
-      setColumnId(widget.settings?.column_id || '');
-      setCustomText(widget.settings?.customText || '');
-      setTargetValue(widget.settings?.targetValue || '');
-    } else {
-      // Yeni widget
-      const selectedType = WIDGET_TYPES.find(t => t.value === widgetType);
-      setTitle(selectedType?.label || '');
-      setIcon(selectedType?.icon || '📊');
+    if (isOpen) {
+      if (widget) {
+        // Düzenleme modu
+        setWidgetType(widget.widget_type);
+        setTitle(widget.title);
+        setIcon(widget.icon);
+        setColor(widget.settings?.color || 'blue');
+        setCustomColor(widget.settings?.customColor || '#3b82f6');
+        setColumnId(widget.settings?.column_id || '');
+        setCustomText(widget.settings?.customText || '');
+        setTargetValue(widget.settings?.targetValue || '');
+        setPercentageMode(widget.settings?.percentageMode || 'completed');
+      } else {
+        // Yeni widget - varsayılan değerlerle başla
+        const defaultType = WIDGET_TYPES[0];
+        setWidgetType(defaultType.value);
+        setTitle(defaultType.label);
+        setIcon(defaultType.icon);
+        setColor('blue');
+        setCustomColor('#3b82f6');
+        setColumnId('');
+        setCustomText('');
+        setTargetValue('');
+        setPercentageMode('completed');
+      }
     }
-  }, [widget, widgetType]);
+  }, [isOpen, widget]);
+
+  // Widget tipi değiştiğinde başlık ve ikonu güncelle (yeni widget için)
+  useEffect(() => {
+    if (!widget && isOpen) {
+      const selectedType = WIDGET_TYPES.find(t => t.value === widgetType);
+      if (selectedType) {
+        setTitle(selectedType.label);
+        setIcon(selectedType.icon);
+      }
+    }
+  }, [widgetType, widget, isOpen]);
 
   const handleTypeChange = (type) => {
     setWidgetType(type);
@@ -70,6 +95,10 @@ function WidgetModal({ isOpen, widget = null, columns = [], onSave, onCancel }) 
     if (!widget) {
       setTitle(selectedType?.label || '');
       setIcon(selectedType?.icon || '📊');
+      // Tip değişince diğer alanları temizle
+      setColumnId('');
+      setCustomText('');
+      setTargetValue('');
     }
   };
 
@@ -93,6 +122,13 @@ function WidgetModal({ isOpen, widget = null, columns = [], onSave, onCancel }) 
 
     setSaving(true);
     
+    // Target value'yu güvenli şekilde parse et
+    let parsedTargetValue = 0;
+    if (targetValue) {
+      const targetStr = String(targetValue);
+      parsedTargetValue = parseFloat(targetStr.replace(/,/g, '')) || 0;
+    }
+
     const widgetData = {
       widget_type: widgetType,
       title: title.trim(),
@@ -102,7 +138,8 @@ function WidgetModal({ isOpen, widget = null, columns = [], onSave, onCancel }) 
         ...(color === 'custom' && { customColor }),
         ...(columnId && { column_id: columnId }),
         ...(customText && { customText }),
-        ...(targetValue && { targetValue: parseFloat(targetValue.replace(/,/g, '')) || 0 })
+        ...(parsedTargetValue > 0 && { targetValue: parsedTargetValue }),
+        ...(widgetType === 'target_percentage' && { percentageMode })
       }
     };
 
@@ -115,7 +152,8 @@ function WidgetModal({ isOpen, widget = null, columns = [], onSave, onCancel }) 
   const selectedType = WIDGET_TYPES.find(t => t.value === widgetType);
 
   return (
-    <div className="modal-overlay" onClick={onCancel}>
+    <>
+      <div className="modal-overlay" onClick={onCancel}>
       <div className="modal-content widget-modal-content" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <h3 className="modal-title">
@@ -157,14 +195,16 @@ function WidgetModal({ isOpen, widget = null, columns = [], onSave, onCancel }) 
           {/* İkon */}
           <div className="form-group">
             <label className="form-label">İkon</label>
-            <input
-              type="text"
-              value={icon}
-              onChange={(e) => setIcon(e.target.value)}
-              placeholder="Emoji seçin"
-              className="form-input"
-              maxLength={2}
-            />
+            <div className="icon-selector">
+              <button
+                type="button"
+                onClick={() => setShowIconPicker(true)}
+                className="icon-preview-btn"
+              >
+                <span className="preview-icon">{icon}</span>
+                <span className="preview-text">İkon Seç</span>
+              </button>
+            </div>
           </div>
 
           {/* Renk Teması */}
@@ -236,6 +276,33 @@ function WidgetModal({ isOpen, widget = null, columns = [], onSave, onCancel }) 
             </div>
           )}
 
+          {/* Yüzde Modu (target_percentage için) */}
+          {widgetType === 'target_percentage' && (
+            <div className="form-group">
+              <label className="form-label">Gösterim Modu</label>
+              <div className="percentage-mode-options">
+                <button
+                  type="button"
+                  onClick={() => setPercentageMode('completed')}
+                  className={`mode-option ${percentageMode === 'completed' ? 'active' : ''}`}
+                >
+                  <span className="mode-icon">✅</span>
+                  <span className="mode-label">Tamamlanan</span>
+                  <span className="mode-desc">Harcanan yüzde</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPercentageMode('remaining')}
+                  className={`mode-option ${percentageMode === 'remaining' ? 'active' : ''}`}
+                >
+                  <span className="mode-icon">⏳</span>
+                  <span className="mode-label">Kalan</span>
+                  <span className="mode-desc">Kalan yüzde</span>
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* Kolon Seçimi (gerekirse) */}
           {selectedType?.needsColumn && (
             <div className="form-group">
@@ -279,6 +346,16 @@ function WidgetModal({ isOpen, widget = null, columns = [], onSave, onCancel }) 
         </div>
       </div>
     </div>
+
+      {/* İkon Picker */}
+      {showIconPicker && (
+        <IconPicker
+          currentIcon={icon}
+          onSelect={setIcon}
+          onClose={() => setShowIconPicker(false)}
+        />
+      )}
+    </>
   );
 }
 
